@@ -179,6 +179,8 @@
 
   .hero-note b { color: var(--ink); font-weight: 500; }
 
+  @media (hover: none) { .cursor-only { display: none; } }
+
   /* instrument strip along the bottom edge of the hero */
   .hud {
     border-top: 1px solid var(--line);
@@ -531,7 +533,7 @@
     <p class="hero-note">
       I write <b>Three.js</b> and <b>raw GLSL</b> — 3D product configurators, interactive
       sites, and the engineering logic that sits behind them. The background is a shader
-      running right now, not a video. Move the cursor.
+      running right now, not a video.<span class="cursor-only"> Move the cursor.</span>
     </p>
   </div>
 
@@ -922,6 +924,7 @@
 
   var scale = 1;                    /* render scale, dropped automatically if slow */
   var light = { x: -0.35, y: 0.4, tx: -0.35, ty: 0.4 };
+  var touch = window.matchMedia('(hover: none)').matches;   /* no cursor to steer with */
 
   function resize() {
     var dpr = Math.min(window.devicePixelRatio || 1, 1.5) * scale;
@@ -957,6 +960,12 @@
     resize();
 
     if (visible) {
+      if (touch) {
+        /* nothing steers the light on a phone — walk it slowly instead */
+        var a = (now - start) / 7000;
+        light.tx = Math.cos(a) * 0.75;
+        light.ty = Math.sin(a * 0.8) * 0.55;
+      }
       light.x += (light.tx - light.x) * 0.055;
       light.y += (light.ty - light.y) * 0.055;
       gl.uniform2f(uLight, light.x, light.y);
