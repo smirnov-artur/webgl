@@ -1,0 +1,367 @@
+:root {
+  --ink: #e8edf6;
+  --dim: #7e8899;
+  --line: rgba(255, 255, 255, 0.12);
+  --accent: #4ba8ff;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: #000;
+  color: var(--ink);
+  font-family: var(--sans);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+.app {
+  position: fixed;
+  inset: 0;
+}
+
+.canvas {
+  position: absolute !important;
+  inset: 0;
+  display: block;
+  touch-action: none;
+}
+
+/* A vignette painted in CSS rather than a post pass — it costs nothing and
+   does the same job of holding the eye on the centre. */
+.app::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 47%, transparent 38%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+.title,
+.hud,
+.meters,
+.controls,
+.foot {
+  position: absolute;
+  z-index: 2;
+}
+
+.title {
+  top: 28px;
+  left: 30px;
+  max-width: 330px;
+  animation: rise 1.1s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.title h1 {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.title p {
+  margin-top: 9px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--dim);
+}
+
+.hud {
+  top: 28px;
+  right: 30px;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-align: right;
+  color: var(--dim);
+  animation: rise 1.1s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hud-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 7px;
+  padding: 2px 0;
+}
+
+.hud-row small {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.62;
+}
+
+.hud-val {
+  color: var(--ink);
+  min-width: 52px;
+  text-align: right;
+}
+
+.hud-fps span {
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.hud-fps {
+  padding-bottom: 8px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.meters {
+  left: 30px;
+  bottom: 30px;
+  width: 178px;
+  display: grid;
+  gap: 9px;
+  animation: rise 1.1s 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.meter {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.meter label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.track {
+  height: 2px;
+  background: rgba(255, 255, 255, 0.11);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.fill-bass {
+  background: #2f6dff;
+}
+.fill-voice {
+  background: #4ba8ff;
+}
+.fill-treble {
+  background: #9ad6ff;
+}
+
+.controls {
+  left: 50%;
+  bottom: 34px;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  width: min(440px, calc(100vw - 40px));
+  animation: rise 1.1s 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.segmented {
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(10, 12, 18, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+
+.segmented button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--dim);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  padding: 11px 20px;
+  cursor: pointer;
+  transition: color 0.25s, background-color 0.25s;
+  min-height: 42px;
+}
+
+.segmented button + button {
+  border-left: 1px solid var(--line);
+}
+
+.segmented button:hover {
+  color: var(--ink);
+}
+
+.segmented button.on {
+  color: #061018;
+  background: var(--accent);
+}
+
+.segmented button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.status {
+  font-size: 12px;
+  color: var(--dim);
+  text-align: center;
+  line-height: 1.5;
+  min-height: 18px;
+}
+
+.status.warn {
+  color: #ffb26b;
+}
+
+.foot {
+  right: 30px;
+  bottom: 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  animation: rise 1.1s 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.foot a {
+  color: var(--dim);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.25s, border-color 0.25s;
+}
+
+.foot a:hover {
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--line);
+}
+
+.hint {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.controls {
+  animation-name: riseX;
+}
+
+@keyframes riseX {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (max-width: 760px) {
+  .title {
+    top: 20px;
+    left: 20px;
+    max-width: 60vw;
+  }
+  .title h1 {
+    font-size: 13px;
+  }
+  .title p {
+    font-size: 11.5px;
+    max-width: 240px;
+  }
+  .hud {
+    top: 20px;
+    right: 20px;
+    font-size: 10px;
+  }
+  .hud-fps span {
+    font-size: 21px;
+  }
+  .hud-val {
+    min-width: 44px;
+  }
+  .meters {
+    left: 20px;
+    right: 20px;
+    bottom: 132px;
+    width: auto;
+    gap: 7px;
+  }
+  .controls {
+    bottom: 26px;
+    gap: 10px;
+  }
+  .segmented button {
+    padding: 12px 15px;
+    font-size: 12px;
+    min-height: 46px;
+  }
+  .foot {
+    right: auto;
+    left: 20px;
+    bottom: 8px;
+    font-size: 10px;
+  }
+  .hint {
+    display: none;
+  }
+}
+
+@media (max-height: 560px) {
+  .meters {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title,
+  .hud,
+  .meters,
+  .controls,
+  .foot {
+    animation: none;
+  }
+}
