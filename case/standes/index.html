@@ -387,6 +387,7 @@
     margin: 0;
     background: transparent;
     cursor: ew-resize;
+    touch-action: pan-y;          /* horizontal drag sets the value, vertical still scrolls the page */
   }
 
   .rig-ctl input[type="range"]::-webkit-slider-runnable-track {
