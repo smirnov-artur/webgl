@@ -343,12 +343,41 @@
   }
 
   .rig-ctl .val {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3rem;
     font-family: var(--f-mono);
     font-size: 0.8rem;
     letter-spacing: 0.04em;
     color: var(--ink);
     font-variant-numeric: tabular-nums;
   }
+
+  /* type the dimension you actually have, instead of hunting for it with a thumb */
+  .rig-ctl input[type="number"] {
+    width: 5.5ch;
+    padding: 0 0 2px;
+    border: 0;
+    border-bottom: 1px solid var(--line-lit);
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    -moz-appearance: textfield;
+         appearance: textfield;
+  }
+
+  .rig-ctl input[type="number"]::-webkit-outer-spin-button,
+  .rig-ctl input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .rig-ctl input[type="number"]:focus { border-bottom-color: var(--brass); color: var(--brass); }
+  .rig-ctl input[type="number"]:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+  .rig-ctl .unit { color: var(--mute); }
 
   .rig-ctl input[type="range"] {
     -webkit-appearance: none;
@@ -717,7 +746,7 @@
       <!-- the same move, stripped to one bay type, so the paragraph is testable -->
       <div class="rig">
         <div class="rig-head mono">
-          <p class="live">Live — set the room</p>
+          <p class="live">Live — drag it, or type your room</p>
           <p>Plan view · racking</p>
         </div>
 
@@ -727,16 +756,34 @@
 
         <div class="rig-controls">
           <div class="rig-ctl">
-            <label class="lab" for="in-w"><span class="mono">Room width</span><span class="val" id="out-w">6000 mm</span></label>
-            <input type="range" id="in-w" min="2000" max="14000" step="100" value="6000">
+            <div class="lab">
+              <label class="mono" for="num-w">Room width</label>
+              <span class="val">
+                <input type="number" id="num-w" min="2000" max="14000" step="1" value="6000" inputmode="numeric">
+                <span class="unit">mm</span>
+              </span>
+            </div>
+            <input type="range" id="in-w" min="2000" max="14000" step="100" value="6000" aria-label="Room width, slider">
           </div>
           <div class="rig-ctl">
-            <label class="lab" for="in-d"><span class="mono">Room depth</span><span class="val" id="out-d">8000 mm</span></label>
-            <input type="range" id="in-d" min="2000" max="14000" step="100" value="8000">
+            <div class="lab">
+              <label class="mono" for="num-d">Room depth</label>
+              <span class="val">
+                <input type="number" id="num-d" min="2000" max="14000" step="1" value="8000" inputmode="numeric">
+                <span class="unit">mm</span>
+              </span>
+            </div>
+            <input type="range" id="in-d" min="2000" max="14000" step="100" value="8000" aria-label="Room depth, slider">
           </div>
           <div class="rig-ctl">
-            <label class="lab" for="in-g"><span class="mono">Aisle</span><span class="val" id="out-g">1200 mm</span></label>
-            <input type="range" id="in-g" min="700" max="2500" step="50" value="1200">
+            <div class="lab">
+              <label class="mono" for="num-g">Aisle</label>
+              <span class="val">
+                <input type="number" id="num-g" min="700" max="2500" step="1" value="1200" inputmode="numeric">
+                <span class="unit">mm</span>
+              </span>
+            </div>
+            <input type="range" id="in-g" min="700" max="2500" step="50" value="1200" aria-label="Aisle, slider">
           </div>
           <div class="rig-ctl" style="grid-column: 1 / -1">
             <span class="lab"><span class="mono">Shelves per bay</span><span class="val" id="out-s">4</span></span>
@@ -1109,13 +1156,36 @@
 
   function paint() { build(); figures(); }
 
-  [['in-w', 'w', 'out-w'], ['in-d', 'd', 'out-d'], ['in-g', 'g', 'out-g']].forEach(function (row) {
-    var input = document.getElementById(row[0]);
-    var read = document.getElementById(row[2]);
-    input.addEventListener('input', function () {
-      P[row[1]] = +input.value;
-      read.textContent = input.value + ' mm';
+  /* Two ways in for the same number: drag it, or type the dimension you have
+     in front of you. The slider keeps a round step because it is nicer to
+     drag; the field takes any millimetre, and the field is what holds truth. */
+  [['in-w', 'num-w', 'w'], ['in-d', 'num-d', 'd'], ['in-g', 'num-g', 'g']].forEach(function (row) {
+    var range = document.getElementById(row[0]);
+    var num = document.getElementById(row[1]);
+    var key = row[2];
+    var lo = +num.min, hi = +num.max;
+
+    function apply(v, from) {
+      P[key] = v;
+      if (from !== 'range') range.value = v;
+      if (from !== 'num') num.value = v;
       paint();
+    }
+
+    range.addEventListener('input', function () { apply(+range.value, 'range'); });
+
+    /* take a typed value the moment it is a number inside the range, so 2400
+       lands as you type — without fighting a half-typed "2" by clamping it */
+    num.addEventListener('input', function () {
+      var v = parseInt(num.value, 10);
+      if (isFinite(v) && v >= lo && v <= hi) apply(v, 'num');
+    });
+
+    /* leaving the field, or pressing enter, settles whatever is left in it */
+    num.addEventListener('change', function () {
+      var v = parseInt(num.value, 10);
+      if (!isFinite(v)) v = P[key];
+      apply(Math.min(hi, Math.max(lo, v)), null);
     });
   });
 
