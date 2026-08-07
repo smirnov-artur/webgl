@@ -1,0 +1,1058 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#07080A">
+<title>Artur Smirnov — real-time 3D for the browser</title>
+<meta name="description" content="Freelance WebGL developer. Three.js and hand-written GLSL: 3D product configurators, interactive sites, and the engineering logic behind them. Five live demos.">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2307080A'/%3E%3Cpath d='M6 22 L16 8 L26 22' fill='none' stroke='%23D08B2C' stroke-width='2.5'/%3E%3C/svg%3E">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://smirnov-artur.github.io/webgl/">
+<meta property="og:title" content="Artur Smirnov — real-time 3D for the browser">
+<meta property="og:description" content="Three.js and hand-written GLSL: 3D product configurators, interactive sites, and the engineering logic behind them.">
+<meta property="og:image" content="https://smirnov-artur.github.io/webgl/assets/aurum.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --void:    #07080A;
+    --surface: #0C0E11;
+    --raise:   #12151A;
+    --line:    #1D2229;
+    --line-lit:#2B323B;
+    --ink:     #EDEAE4;
+    --mute:    #8B9199;
+    --dim:     #5C636C;
+    --brass:   #D08B2C;
+    --brass-lo:#8A5C1C;
+    --steel:   #7E97A6;
+
+    --f-sans: "Archivo", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --f-mono: "IBM Plex Mono", "Cascadia Mono", ui-monospace, Consolas, monospace;
+
+    --edge: clamp(1.15rem, 4.5vw, 5rem);
+    --maxw: 1320px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--void);
+    color: var(--ink);
+    font-family: var(--f-sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  a { color: inherit; }
+
+  ::selection { background: var(--brass); color: #10100C; }
+
+  .shell {
+    width: 100%;            /* auto side margins would otherwise cancel flex stretch */
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 var(--edge);
+  }
+
+  .mono {
+    font-family: var(--f-mono);
+    font-size: 0.688rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+
+  /* =======================================================================
+     HERO — live shader canvas, content laid over it
+     ======================================================================= */
+
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    isolation: isolate;
+  }
+
+  #gl {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: -2;
+  }
+
+  /* used when WebGL is unavailable, and as the paint before first frame */
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -3;
+    background:
+      radial-gradient(120% 80% at 22% 12%, #14181E 0%, transparent 60%),
+      radial-gradient(90% 70% at 85% 90%, #16120C 0%, transparent 55%),
+      var(--void);
+  }
+
+  /* legibility scrim, kept off the top-right so the shader stays visible */
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(to top, rgba(7,8,10,0.92) 0%, rgba(7,8,10,0.55) 34%, rgba(7,8,10,0.06) 62%, rgba(7,8,10,0.4) 100%);
+  }
+
+  .hero-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    flex-wrap: wrap;
+    padding-top: clamp(1.3rem, 3vw, 2.2rem);
+  }
+
+  .mark {
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .mark i {
+    width: 9px;
+    height: 9px;
+    background: var(--brass);
+    display: block;
+    transform: rotate(45deg);
+    flex: none;
+  }
+
+  .hero-body {
+    margin-top: auto;
+    padding-bottom: clamp(1.4rem, 3vw, 2.2rem);
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: end;
+    gap: clamp(1.2rem, 3vw, 3rem);
+  }
+
+  h1 {
+    margin: 0;
+    font-weight: 800;
+    font-size: clamp(2.6rem, 8.2vw, 6.6rem);
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  h1 span { display: block; }
+  h1 .lit { color: var(--brass); }
+
+  .hero-note {
+    margin: 0;
+    color: var(--mute);
+    font-size: clamp(0.95rem, 1.3vw, 1.08rem);
+    max-width: 46ch;
+    padding-bottom: 0.4rem;
+  }
+
+  .hero-note b { color: var(--ink); font-weight: 500; }
+
+  /* instrument strip along the bottom edge of the hero */
+  .hud {
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.4rem 1.5rem;
+    padding: 0.75rem 0 clamp(0.9rem, 2vw, 1.4rem);
+  }
+
+  .hud > :nth-child(2) { text-align: center; }
+  .hud > :nth-child(3) { text-align: right; }
+
+  .hud .live { color: var(--brass); }
+
+  .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brass);
+    margin-right: 0.45rem;
+    vertical-align: middle;
+    animation: pulse 2.6s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+  /* =======================================================================
+     SECTION FRAME
+     ======================================================================= */
+
+  section.band { padding: clamp(3.6rem, 9vw, 7.5rem) 0 0; }
+
+  .band-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--line);
+    padding-top: 0.85rem;
+    margin-bottom: clamp(1.8rem, 4vw, 3rem);
+  }
+
+  .band-head h2 {
+    margin: 0;
+    font-size: clamp(1.6rem, 3.4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+    line-height: 1;
+    flex: 1 1 16ch;
+  }
+
+  .band-head .mono { flex: none; }
+
+  /* =======================================================================
+     WHAT I DO — a ledger, not a row of cards
+     ======================================================================= */
+
+  .ledger { border-bottom: 1px solid var(--line); }
+
+  .row-do {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 4fr) minmax(0, 7fr);
+    gap: 0.4rem clamp(1rem, 3vw, 2.5rem);
+    padding: clamp(1.1rem, 2.4vw, 1.7rem) 0;
+    border-top: 1px solid var(--line);
+    align-items: start;
+  }
+
+  .row-do h3 {
+    margin: 0;
+    font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+
+  .row-do p { margin: 0; color: var(--mute); }
+  .row-do p b { color: var(--ink); font-weight: 500; }
+
+  /* =======================================================================
+     DEMOS — deliberately uneven grid
+     ======================================================================= */
+
+  .demos {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: clamp(0.7rem, 1.6vw, 1.15rem);
+    align-items: start;      /* cards size to content — ragged bottoms, no dead space */
+  }
+
+  .demo {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  /* 7|5 · 5|7 · 12 — the mirrored rhythm is what keeps this off a card grid */
+  .demo:nth-child(1) { grid-column: span 7; }
+  .demo:nth-child(2) { grid-column: span 5; }
+  .demo:nth-child(3) { grid-column: span 5; }
+  .demo:nth-child(4) { grid-column: span 7; }
+  .demo:nth-child(5) { grid-column: span 12; }
+
+  .demo:hover, .demo:focus-visible { border-color: var(--line-lit); background: var(--raise); }
+  .demo:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+  .demo .thumb {
+    margin: 0;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #05060A;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .demo:nth-child(5) .thumb { aspect-ratio: 21 / 9; }
+
+  .demo .thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.92);
+    transition: transform 0.55s cubic-bezier(0.2, 0.7, 0.3, 1), filter 0.35s ease;
+  }
+
+  .demo:hover .thumb img { transform: scale(1.03); filter: saturate(1.05); }
+
+  .demo-body {
+    padding: clamp(0.85rem, 1.6vw, 1.2rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    flex: 1 1 auto;
+  }
+
+  .demo-name {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .demo h3 {
+    margin: 0;
+    font-size: clamp(1.05rem, 1.9vw, 1.4rem);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+  }
+
+  .demo p { margin: 0; color: var(--mute); font-size: 0.92rem; }
+
+  .demo .go {
+    margin-top: auto;
+    padding-top: 0.7rem;
+    color: var(--brass);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .demo .go .arw { transition: transform 0.25s ease; }
+  .demo:hover .go .arw { transform: translateX(6px); }
+
+  /* =======================================================================
+     WORK — index with a cursor-following preview
+     ======================================================================= */
+
+  .index { border-bottom: 1px solid var(--line); }
+
+  .job {
+    display: grid;
+    grid-template-columns: 3.2rem minmax(0, 3.4fr) minmax(0, 6fr) minmax(0, 2.4fr);
+    gap: 0.35rem clamp(1rem, 2.5vw, 2.2rem);
+    align-items: baseline;
+    padding: clamp(0.95rem, 2vw, 1.45rem) 0;
+    border-top: 1px solid var(--line);
+    position: relative;
+    transition: color 0.2s ease;
+  }
+
+  .job::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    height: 1px;
+    width: 0;
+    background: var(--brass);
+    transition: width 0.45s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  .job:hover::after { width: 100%; }
+
+  .job h3 {
+    margin: 0;
+    font-size: clamp(1.02rem, 1.7vw, 1.25rem);
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    text-transform: uppercase;
+  }
+
+  .job p { margin: 0; color: var(--mute); font-size: 0.95rem; }
+  .job:hover h3 { color: var(--brass); }
+  .job .tags { color: var(--dim); }
+
+  .job img {
+    display: none;
+    width: 100%;
+    border: 1px solid var(--line);
+  }
+
+  .also {
+    padding-top: 1.15rem;
+    margin: 0;
+    color: var(--dim);
+    font-size: 0.92rem;
+    max-width: 82ch;
+  }
+
+  #peek {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 22rem;
+    max-width: 34vw;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border: 1px solid var(--line-lit);
+    background: #05060A;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(0.94);
+    transition: opacity 0.22s ease, transform 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
+    z-index: 60;
+  }
+
+  #peek.on { opacity: 1; transform: translate3d(-50%, -50%, 0) scale(1); }
+
+  /* =======================================================================
+     CONTACT
+     ======================================================================= */
+
+  .contact {
+    margin-top: clamp(3.6rem, 9vw, 7rem);
+    border-top: 1px solid var(--line-lit);
+    padding: clamp(2rem, 5vw, 3.4rem) 0 clamp(2.4rem, 6vw, 4rem);
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(1.4rem, 3vw, 3rem);
+    align-items: end;
+  }
+
+  .contact h2 {
+    margin: 0 0 0.9rem;
+    font-size: clamp(1.9rem, 4.4vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .handle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: clamp(1.15rem, 2.4vw, 1.7rem);
+    font-weight: 600;
+    color: var(--brass);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+  }
+
+  .handle:hover { border-bottom-color: var(--brass); }
+  .handle:focus-visible { outline: 2px solid var(--brass); outline-offset: 4px; }
+
+  .contact-meta { display: flex; flex-direction: column; gap: 0.5rem; }
+  .contact-meta span { display: block; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 1.1rem 0 2.4rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.4rem 2rem;
+    flex-wrap: wrap;
+  }
+
+  /* =======================================================================
+     NARROW
+     ======================================================================= */
+
+  @media (max-width: 900px) {
+    .hero-body { grid-template-columns: minmax(0, 1fr); align-items: start; }
+    .hud { grid-template-columns: 1fr 1fr; }
+    .hud > :nth-child(2) { display: none; }
+    .demo:nth-child(n) { grid-column: span 12; }
+    .demo:nth-child(5) .thumb { aspect-ratio: 16 / 9; }
+    .contact { grid-template-columns: minmax(0, 1fr); align-items: start; }
+    #peek { display: none; }
+  }
+
+  @media (max-width: 700px) {
+    .row-do {
+      grid-template-columns: 2.6rem minmax(0, 1fr);
+      row-gap: 0.5rem;
+    }
+    .row-do p { grid-column: 2; }
+
+    .job {
+      grid-template-columns: 2.6rem minmax(0, 1fr);
+      row-gap: 0.55rem;
+    }
+    .job p, .job .tags { grid-column: 2; }
+    .job img { display: block; grid-column: 2; margin-top: 0.35rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========================================================================
+     HERO
+     ===================================================================== -->
+<header class="hero">
+  <canvas id="gl" aria-hidden="true"></canvas>
+
+  <div class="shell hero-top">
+    <p class="mark"><i aria-hidden="true"></i>Artur Smirnov</p>
+    <p class="mono">Freelance · WebGL &amp; Three.js</p>
+  </div>
+
+  <div class="shell hero-body">
+    <h1><span>Real&#8209;time&nbsp;3D</span><span class="lit">for the browser</span></h1>
+    <p class="hero-note">
+      I write <b>Three.js</b> and <b>raw GLSL</b> — 3D product configurators, interactive
+      sites, and the engineering logic that sits behind them. The background is a shader
+      running right now, not a video. Move the cursor.
+    </p>
+  </div>
+
+  <div class="shell">
+    <div class="hud mono">
+      <span>GLSL · <span id="ctx">WebGL</span> · <span id="fps" class="live">—</span> FPS</span>
+      <span>Hand-written shader, no libraries</span>
+      <span><i class="dot" aria-hidden="true"></i>Available for contract</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ======================================================================
+       WHAT I DO
+       =================================================================== -->
+  <section class="band shell" aria-labelledby="do-t">
+    <div class="band-head">
+      <p class="mono">01 — What I do</p>
+      <h2 id="do-t">Three things, done properly</h2>
+    </div>
+
+    <div class="ledger">
+      <div class="row-do">
+        <p class="mono">01</p>
+        <h3>3D product configurators</h3>
+        <p>
+          The customer builds the product in the browser — parts snap together, the price
+          follows the layout, the finished scene exports to <b>AR</b>, a render, or a brief
+          the factory can read. Runs in a tab, nothing to install.
+        </p>
+      </div>
+
+      <div class="row-do">
+        <p class="mono">02</p>
+        <h3>WebGL &amp; GLSL</h3>
+        <p>
+          Shaders written for the brief instead of pulled off a shelf: cursor physics,
+          parametric geometry, generative material, scroll-bound camera. Built to hold the
+          <b>frame budget on a laptop GPU</b>, not just on my machine.
+        </p>
+      </div>
+
+      <div class="row-do">
+        <p class="mono">03</p>
+        <h3>Complex domain logic in the browser</h3>
+        <p>
+          Selection engines, parametric catalogues, live quoting, legacy databases dragged
+          into the web. This is the part that makes a configurator <b>a tool people order
+          from</b> rather than a showreel.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       DEMOS
+       =================================================================== -->
+  <section class="band shell" aria-labelledby="demo-t">
+    <div class="band-head">
+      <p class="mono">02 — Live</p>
+      <h2 id="demo-t">Five things to open</h2>
+      <p class="mono">Click, drag, scroll — they run</p>
+    </div>
+
+    <div class="demos">
+
+      <a class="demo" href="work/aurum/">
+        <figure class="thumb">
+          <img src="assets/aurum.jpg" width="1000" height="562" decoding="async"
+               alt="AURUM: a bronze horse sculpture lit against a dark ground, with the title Bronze and Time">
+        </figure>
+        <div class="demo-body">
+          <div class="demo-name">
+            <h3>Aurum</h3>
+            <span class="mono">GLSL · scroll</span>
+          </div>
+          <p>A bronze sculpture rendered on raw shaders. The camera orbits a full 360° as you scroll, lighting and grain resolved per pixel.</p>
+          <span class="go mono"><span>Open</span><span class="arw">→</span></span>
+        </div>
+      </a>
+
+      <a class="demo" href="work/signal/">
+        <figure class="thumb">
+          <img src="assets/signal.jpg" width="1000" height="562" loading="lazy" decoding="async"
+               alt="SIGNAL: a volumetric coin bearing the ticker $SIGNAL beside a panel of live shader parameters">
+        </figure>
+        <div class="demo-body">
+          <div class="demo-name">
+            <h3>Signal</h3>
+            <span class="mono">Generative</span>
+          </div>
+          <p>Type any ticker. Geometry, palette and motion re-roll from its hash — live, in one file.</p>
+          <span class="go mono"><span>Open</span><span class="arw">→</span></span>
+        </div>
+      </a>
+
+      <a class="demo" href="work/vault/">
+        <figure class="thumb">
+          <img src="assets/vault.jpg" width="1000" height="562" loading="lazy" decoding="async"
+               alt="VAULT: a dark tokenomics dashboard with an emission curve, key metrics and a particle supply sphere">
+        </figure>
+        <div class="demo-body">
+          <div class="demo-name">
+            <h3>Vault</h3>
+            <span class="mono">Data · WebGL</span>
+          </div>
+          <p>Emission curve, vesting schedule and a 4,000-particle supply sphere, all driven off one state object.</p>
+          <span class="go mono"><span>Open</span><span class="arw">→</span></span>
+        </div>
+      </a>
+
+      <a class="demo" href="work/ferro/">
+        <figure class="thumb">
+          <img src="assets/ferro.jpg" width="1000" height="562" loading="lazy" decoding="async"
+               alt="Ferro: a light studio landing page with a full-bleed portrait and the headline Bold ideas, shipped with quiet precision">
+        </figure>
+        <div class="demo-body">
+          <div class="demo-name">
+            <h3>Ferro</h3>
+            <span class="mono">Cursor · mask</span>
+          </div>
+          <p>A studio landing page where a liquid cursor tears open a second image directly under the pointer.</p>
+          <span class="go mono"><span>Open</span><span class="arw">→</span></span>
+        </div>
+      </a>
+
+      <a class="demo" href="work/flux/">
+        <figure class="thumb">
+          <img src="assets/flux.jpg" width="1000" height="562" loading="lazy" decoding="async"
+               alt="Fluxwave: a neon flower on a cliff at dusk with the Fluxwave wordmark set over live video">
+        </figure>
+        <div class="demo-body">
+          <div class="demo-name">
+            <h3>Fluxwave</h3>
+            <span class="mono">Video · cursor</span>
+          </div>
+          <p>Neon opening screen on live background video, with cursor physics written from scratch.</p>
+          <span class="go mono"><span>Open</span><span class="arw">→</span></span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       SELECTED WORK
+       =================================================================== -->
+  <section class="band shell" aria-labelledby="work-t">
+    <div class="band-head">
+      <p class="mono">03 — Selected work</p>
+      <h2 id="work-t">Shipped, in production</h2>
+      <p class="mono">Hover for a look</p>
+    </div>
+
+    <div class="index" id="index">
+
+      <article class="job" data-peek="assets/standes.jpg">
+        <p class="mono">01</p>
+        <h3>Standes</h3>
+        <p>A 3D shelving configurator: set the room, place the units, watch the price follow, then export to AR or send the layout as a brief.</p>
+        <p class="mono tags">Three.js · configurator</p>
+        <img src="assets/standes.jpg" loading="lazy" alt="Standes: a retail room laid out with shelving in 3D, catalogue and running quote alongside">
+      </article>
+
+      <article class="job" data-peek="assets/ventprom.jpg">
+        <p class="mono">02</p>
+        <h3>Ventprom</h3>
+        <p>Parametric duct fittings. Enter the dimensions, watch the part redraw with its dimension lines, leave with a costed quote.</p>
+        <p class="mono tags">Parametric · quoting</p>
+        <img src="assets/ventprom.jpg" loading="lazy" alt="Ventprom: a duct fitting drawn to entered dimensions with dimension lines and a live price panel">
+      </article>
+
+      <article class="job" data-peek="assets/dios.jpg">
+        <p class="mono">03</p>
+        <h3>Dios+</h3>
+        <p>A fleet globe: ships and aircraft moving along great-circle routes to 28 cities, on NASA textures with a cloud layer and atmospheric halo.</p>
+        <p class="mono tags">Three.js · globe</p>
+        <img src="assets/dios.jpg" loading="lazy" alt="Dios+: a 3D globe with cargo ships and aircraft on great-circle routes between world cities">
+      </article>
+
+      <article class="job" data-peek="assets/ventmarket.jpg">
+        <p class="mono">04</p>
+        <h3>Ventmarket</h3>
+        <p>Selection by operating point: enter airflow and pressure, get the unit, the curve through the point, and the order built around it — 400+ units, ~20,000 polynomial curves.</p>
+        <p class="mono tags">Domain logic</p>
+        <img src="assets/ventmarket.jpg" loading="lazy" alt="Ventmarket: an online fan selection screen driven by an operating point">
+      </article>
+
+      <article class="job" data-peek="assets/srez.jpg">
+        <p class="mono">05</p>
+        <h3>Srez</h3>
+        <p>A materials catalogue you can read with your hands: drag a raking light across the coating and the relief comes up, the way a plasterer checks a wall.</p>
+        <p class="mono tags">Interaction · art direction</p>
+        <img src="assets/srez.jpg" loading="lazy" alt="Srez: a decorative coating shown under a movable raking light that reveals its relief">
+      </article>
+
+      <article class="job" data-peek="assets/vertro.jpg">
+        <p class="mono">06</p>
+        <h3>Vertro</h3>
+        <p>A desktop engineering suite pulled out of VB6 and Access and rebuilt for the web: nine calculation modules, 63 tables, 3,471 records, one URL.</p>
+        <p class="mono tags">Legacy migration</p>
+        <img src="assets/vertro.jpg" loading="lazy" alt="Vertro: nine calculation modules on a web home screen with counters for the migrated database">
+      </article>
+
+    </div>
+
+    <p class="also">
+      Also on the shelf: computer-vision overlays for live streams, spaced-repetition
+      learning platforms, a Spring Boot backend with 53 endpoints, and a speech-synthesis
+      model. Happy to walk through any of it.
+    </p>
+  </section>
+
+</main>
+
+<!-- ========================================================================
+     CONTACT
+     ===================================================================== -->
+<section class="contact shell" id="contact">
+  <div>
+    <h2>Got something that has to run at 60 fps?</h2>
+    <a class="handle" href="https://t.me/smirnovarturr" target="_blank" rel="noopener">
+      Telegram @smirnovarturr <span aria-hidden="true">→</span>
+    </a>
+
+    <!-- ====================================================================
+         TODO · EMAIL — почты пока нет. Когда появится рабочий адрес:
+           1) раскомментировать блок ниже;
+           2) заменить ОБА вхождения name@example.com на реальный адрес
+              (в href="mailto:..." и в видимом тексте).
+         Западные клиенты и агентства часто пишут только на почту —
+         без адреса часть входящих теряется. Стили .handle уже готовы.
+         ================================================================= -->
+    <!--
+    <a class="handle" href="mailto:name@example.com" style="margin-top:0.9rem">
+      name@example.com <span aria-hidden="true">→</span>
+    </a>
+    -->
+  </div>
+
+  <div class="contact-meta mono">
+    <span>Currently available for contract work</span>
+    <span>Remote · UTC+3 — a full European day and US East Coast mornings</span>
+    <span>Usually a reply within the hour</span>
+  </div>
+</section>
+
+<footer class="shell mono">
+  <span>Artur Smirnov — real-time 3D &amp; browser engineering</span>
+  <span>Built with no framework</span>
+</footer>
+
+<img id="peek" alt="" aria-hidden="true">
+
+<script>
+/* =========================================================================
+   1. HERO SHADER
+   A contour topography with a metal sheen: domain-warped value noise gives
+   the height field, finite differences give both the pseudo-normal and the
+   screen-space line width, so no derivative extension is needed.
+   ====================================================================== */
+(function () {
+  var canvas = document.getElementById('gl');
+  var fpsOut = document.getElementById('fps');
+  var ctxOut = document.getElementById('ctx');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var gl = canvas.getContext('webgl2', { antialias: false, alpha: false, powerPreference: 'high-performance' });
+  var isGL2 = !!gl;
+  if (!gl) gl = canvas.getContext('webgl', { antialias: false, alpha: false }) ||
+                canvas.getContext('experimental-webgl', { antialias: false, alpha: false });
+
+  if (!gl) {
+    canvas.style.display = 'none';
+    if (ctxOut) ctxOut.textContent = 'no webgl';
+    if (fpsOut) { fpsOut.textContent = '–'; fpsOut.classList.remove('live'); }
+    return;
+  }
+  if (ctxOut) ctxOut.textContent = isGL2 ? 'WebGL2' : 'WebGL';
+
+  var VERT = [
+    'attribute vec2 p;',
+    'void main(){ gl_Position = vec4(p, 0.0, 1.0); }'
+  ].join('\n');
+
+  var FRAG = [
+    'precision highp float;',
+    'uniform vec2 uRes;',
+    'uniform float uTime;',
+    'uniform vec2 uLight;',
+
+    'float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }',
+
+    'float noise(vec2 p){',
+    '  vec2 i = floor(p), f = fract(p);',
+    '  vec2 u = f * f * (3.0 - 2.0 * f);',
+    '  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),',
+    '             mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);',
+    '}',
+
+    'float fbm(vec2 p){',
+    '  float s = 0.0, a = 0.5;',
+    '  for (int i = 0; i < 3; i++){ s += a * noise(p); p = p * 2.07 + vec2(3.1, 1.7); a *= 0.5; }',
+    '  return s;',
+    '}',
+
+    /* domain-warped height field — the warp is what stops it reading as plain noise */
+    'float height(vec2 p){',
+    '  float t = uTime * 0.035;',
+    '  vec2 q = vec2(fbm(p + vec2(0.0, t)), fbm(p + vec2(5.2, 1.3) - t * 0.6));',
+    '  return fbm(p + 2.15 * q + vec2(1.7, 9.2));',
+    '}',
+
+    'void main(){',
+    '  vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;',
+    '  vec2 p = uv * 3.1 + vec2(uTime * 0.012, 0.0);',
+
+    '  float e = 1.6 / uRes.y * 3.1;',
+    '  float h  = height(p);',
+    '  float hx = height(p + vec2(e, 0.0)) - h;',
+    '  float hy = height(p + vec2(0.0, e)) - h;',
+
+    /* contour bands */
+    '  const float N = 15.0;',
+    '  float w = length(vec2(hx, hy)) * N;',
+    '  float d = abs(fract(h * N) - 0.5);',
+    '  float line = 1.0 - smoothstep(0.35 * w, 1.35 * w + 0.0015, d);',
+
+    /* lighting off the pseudo-normal, light steered by the pointer */
+    '  vec3 n = normalize(vec3(-hx * 26.0, -hy * 26.0, e * 4.0));',
+    '  vec3 l = normalize(vec3(uLight, 0.72));',
+    '  float diff = max(dot(n, l), 0.0);',
+    '  float spec = pow(max(dot(reflect(-l, n), vec3(0.0, 0.0, 1.0)), 0.0), 22.0);',
+
+    /* a slow brass sweep travelling across the field */
+    '  float sweep = smoothstep(0.72, 1.0, sin(uv.x * 1.15 - uTime * 0.16 + h * 2.4) * 0.5 + 0.5);',
+
+    '  vec3 deep  = vec3(0.027, 0.031, 0.039);',
+    '  vec3 raise = vec3(0.055, 0.064, 0.078);',
+    '  vec3 steel = vec3(0.42, 0.50, 0.58);',
+    '  vec3 brass = vec3(0.86, 0.56, 0.18);',
+
+    '  vec3 col = mix(deep, raise, smoothstep(0.18, 0.86, h));',
+    '  col += steel * line * (0.16 + 0.72 * diff);',
+    '  col += brass * line * sweep * 0.55;',
+    '  col += brass * spec * 0.42;',
+
+    /* vignette + grain, so it never looks like a flat gradient */
+    '  float vig = 1.0 - 0.55 * dot(uv * vec2(0.72, 1.0), uv * vec2(0.72, 1.0));',
+    '  col *= clamp(vig, 0.0, 1.0);',
+    '  col += (hash(gl_FragCoord.xy + fract(uTime)) - 0.5) * 0.016;',
+
+    '  gl_FragColor = vec4(col, 1.0);',
+    '}'
+  ].join('\n');
+
+  function compile(type, src) {
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { gl.deleteShader(s); return null; }
+    return s;
+  }
+
+  var vs = compile(gl.VERTEX_SHADER, VERT);
+  var fs = compile(gl.FRAGMENT_SHADER, FRAG);
+  if (!vs || !fs) { canvas.style.display = 'none'; return; }
+
+  var prog = gl.createProgram();
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { canvas.style.display = 'none'; return; }
+  gl.useProgram(prog);
+
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  var loc = gl.getAttribLocation(prog, 'p');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+  var uRes = gl.getUniformLocation(prog, 'uRes');
+  var uTime = gl.getUniformLocation(prog, 'uTime');
+  var uLight = gl.getUniformLocation(prog, 'uLight');
+
+  var scale = 1;                    /* render scale, dropped automatically if slow */
+  var light = { x: -0.35, y: 0.4, tx: -0.35, ty: 0.4 };
+
+  function resize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5) * scale;
+    var w = Math.max(1, Math.round(canvas.clientWidth * dpr));
+    var h = Math.max(1, Math.round(canvas.clientHeight * dpr));
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+      gl.viewport(0, 0, w, h);
+      gl.uniform2f(uRes, w, h);
+    }
+  }
+
+  window.addEventListener('resize', resize, { passive: true });
+
+  window.addEventListener('pointermove', function (ev) {
+    if (ev.clientY > window.innerHeight) return;
+    light.tx = (ev.clientX / window.innerWidth) * 2.0 - 1.0;
+    light.ty = 1.0 - (ev.clientY / window.innerHeight) * 2.0;
+  }, { passive: true });
+
+  /* only draw while the hero is on screen */
+  var visible = true;
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }, { threshold: 0 })
+      .observe(canvas);
+  }
+
+  var start = performance.now();
+  var frames = 0, fpsMark = start, checked = false;
+
+  function frame(now) {
+    resize();
+
+    if (visible) {
+      light.x += (light.tx - light.x) * 0.055;
+      light.y += (light.ty - light.y) * 0.055;
+      gl.uniform2f(uLight, light.x, light.y);
+      gl.uniform1f(uTime, reduce ? 12.0 : (now - start) / 1000);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+      frames++;
+      if (now - fpsMark >= 500) {
+        var fps = Math.round(frames * 1000 / (now - fpsMark));
+        if (fpsOut) fpsOut.textContent = fps;
+        /* one-time quality drop for weak GPUs */
+        if (!checked && now - start > 2500) {
+          checked = true;
+          if (fps < 40) { scale = 0.62; resize(); }
+        }
+        frames = 0;
+        fpsMark = now;
+      }
+    }
+
+    if (!reduce) requestAnimationFrame(frame);
+  }
+
+  resize();
+  requestAnimationFrame(frame);
+
+  if (reduce) {
+    /* single static frame, then leave the GPU alone */
+    gl.uniform2f(uLight, light.x, light.y);
+    gl.uniform1f(uTime, 12.0);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    if (fpsOut) { fpsOut.textContent = 'still'; fpsOut.classList.remove('live'); }
+  }
+})();
+
+/* =========================================================================
+   2. WORK INDEX — preview that follows the cursor
+   ====================================================================== */
+(function () {
+  var peek = document.getElementById('peek');
+  var index = document.getElementById('index');
+  if (!peek || !index) return;
+  if (window.matchMedia('(hover: none)').matches) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var jobs = [].slice.call(index.querySelectorAll('.job'));
+
+  /* the inline thumbs are display:none on desktop, so nothing has fetched them yet —
+     warm them once the pointer reaches the index, not before */
+  var warmed = false;
+  index.addEventListener('pointerenter', function () {
+    if (warmed) return;
+    warmed = true;
+    jobs.forEach(function (j) { new Image().src = j.getAttribute('data-peek'); });
+  });
+
+  var target = { x: 0, y: 0 };
+  var pos = { x: 0, y: 0 };
+  var on = false;
+  var raf = null;
+
+  function tick() {
+    pos.x += (target.x - pos.x) * 0.16;
+    pos.y += (target.y - pos.y) * 0.16;
+    peek.style.left = pos.x + 'px';
+    peek.style.top = pos.y + 'px';
+    if (on) { raf = requestAnimationFrame(tick); } else { raf = null; }
+  }
+
+  jobs.forEach(function (job) {
+    var src = job.getAttribute('data-peek');
+
+    job.addEventListener('pointerenter', function (ev) {
+      if (ev.pointerType === 'touch') return;
+      peek.src = src;
+      target.x = pos.x = ev.clientX;
+      target.y = pos.y = ev.clientY;
+      peek.style.left = pos.x + 'px';
+      peek.style.top = pos.y + 'px';
+      peek.classList.add('on');
+      on = true;
+      if (!raf) raf = requestAnimationFrame(tick);
+    });
+
+    job.addEventListener('pointermove', function (ev) {
+      target.x = ev.clientX;
+      target.y = ev.clientY;
+    }, { passive: true });
+
+    job.addEventListener('pointerleave', function () {
+      peek.classList.remove('on');
+      on = false;
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
