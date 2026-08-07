@@ -581,7 +581,8 @@
   }
 
   .handle {
-    display: inline-flex;
+    display: flex;          /* one per line — two contacts, not one run-on */
+    width: fit-content;
     align-items: center;
     gap: 0.7rem;
     font-size: clamp(1.1rem, 2.2vw, 1.6rem);
@@ -593,6 +594,18 @@
   }
 
   .handle:hover { border-bottom-color: var(--brass); }
+  .handle + .handle { margin-top: 0.9rem; }
+
+  /* who is behind this, and what the next move is — the two things a page
+     like this usually forgets to say */
+  .pitch {
+    margin: 0 0 1.3rem;
+    color: var(--mute);
+    font-size: clamp(1rem, 1.35vw, 1.1rem);
+    max-width: 54ch;
+  }
+
+  .pitch b { color: var(--ink); font-weight: 500; }
 
   .contact-meta { display: flex; flex-direction: column; gap: 0.5rem; }
 
@@ -769,7 +782,7 @@
             <span class="mono">Steel, kg</span>
           </div>
           <div class="cost">
-            <span class="num" id="out-cost">€20.51</span>
+            <span class="num" id="out-cost">€20.52</span>
             <span class="mono">Indicative</span>
           </div>
         </div>
@@ -901,6 +914,16 @@
 <section class="contact shell">
   <div>
     <h2>Got a range that only exists once someone types the numbers?</h2>
+
+    <p class="pitch">
+      I'm <b>Artur Smirnov</b> — I designed and built this one end to end, and I take this
+      kind of work on contract. Send me a spec you priced by hand this week. I'll come back
+      with what it takes to make it generate itself, and what it wouldn't be worth doing.
+    </p>
+
+    <a class="handle" href="mailto:paladei702@gmail.com">
+      paladei702@gmail.com <span aria-hidden="true">→</span>
+    </a>
     <a class="handle" href="https://t.me/smirnovarturr" target="_blank" rel="noopener">
       Telegram @smirnovarturr <span aria-hidden="true">→</span>
     </a>

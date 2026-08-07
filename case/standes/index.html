@@ -562,7 +562,8 @@
   }
 
   .handle {
-    display: inline-flex;
+    display: flex;          /* one per line — two contacts, not one run-on */
+    width: fit-content;
     align-items: center;
     gap: 0.7rem;
     font-size: clamp(1.1rem, 2.2vw, 1.6rem);
@@ -574,6 +575,18 @@
   }
 
   .handle:hover { border-bottom-color: var(--brass); }
+  .handle + .handle { margin-top: 0.9rem; }
+
+  /* who is behind this, and what the next move is — the two things a page
+     like this usually forgets to say */
+  .pitch {
+    margin: 0 0 1.3rem;
+    color: var(--mute);
+    font-size: clamp(1rem, 1.35vw, 1.1rem);
+    max-width: 54ch;
+  }
+
+  .pitch b { color: var(--ink); font-weight: 500; }
 
   .contact-meta { display: flex; flex-direction: column; gap: 0.5rem; }
 
@@ -867,6 +880,16 @@
 <section class="contact shell">
   <div>
     <h2>Got a product that has to be configured before it can be quoted?</h2>
+
+    <p class="pitch">
+      I'm <b>Artur Smirnov</b> — I designed and built this one end to end, and I take this
+      kind of work on contract. Send me a floor plan you quoted by hand this month. I'll come
+      back with what a configurator for it would take, and what it wouldn't be worth doing.
+    </p>
+
+    <a class="handle" href="mailto:paladei702@gmail.com">
+      paladei702@gmail.com <span aria-hidden="true">→</span>
+    </a>
     <a class="handle" href="https://t.me/smirnovarturr" target="_blank" rel="noopener">
       Telegram @smirnovarturr <span aria-hidden="true">→</span>
     </a>
