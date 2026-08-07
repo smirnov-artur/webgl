@@ -178,9 +178,11 @@
   h1 {
     margin: 0;
     font-weight: 800;
-    font-size: clamp(2.5rem, 7.6vw, 5.8rem);
+    /* the top end matches the front page; tracking follows the rule that the
+       bigger the size, the harder the negative — about −4% at 90px and up */
+    font-size: clamp(2.6rem, 8.2vw, 6.6rem);
     line-height: 0.9;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.04em;
     text-transform: uppercase;
     text-wrap: balance;
   }
@@ -902,6 +904,45 @@
   var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   svg.appendChild(g);
 
+  /* ---------------------------------------------------------------------
+     Camera. The frame re-fits on a spring, so resizing the room glides
+     instead of snapping between the discrete steps. Only the view carries
+     inertia — the plan and the counts below stay exact and instant, so the
+     drawing can never show a different layout from the one being totalled.
+     ------------------------------------------------------------------ */
+  var REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cam = null, camT = null, camV = [0, 0, 0, 0], raf = null, last = 0;
+
+  function writeView(v) {
+    svg.setAttribute('viewBox', v[0].toFixed(1) + ' ' + v[1].toFixed(1) + ' ' +
+                                v[2].toFixed(1) + ' ' + v[3].toFixed(1));
+  }
+
+  function setView(x, y, w, h) {
+    camT = [x, y, w, h];
+    if (!cam || REDUCE) { cam = camT.slice(); camV = [0, 0, 0, 0]; writeView(cam); return; }
+    if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); }
+  }
+
+  function tick(now) {
+    var dt = Math.min((now - last) / 1000, 1 / 30);
+    last = now;
+    var K = 190, C = 2 * Math.sqrt(190);   /* critically damped — a plan must not wobble */
+    var moving = false;
+    for (var i = 0; i < 4; i++) {
+      camV[i] += (-K * (cam[i] - camT[i]) - C * camV[i]) * dt;
+      cam[i] += camV[i] * dt;
+      if (Math.abs(cam[i] - camT[i]) > camT[2] * 0.0004 ||
+          Math.abs(camV[i]) > camT[2] * 0.004) moving = true;
+    }
+    writeView(cam);
+    if (moving) {
+      raf = requestAnimationFrame(tick);
+    } else {
+      cam = camT.slice(); camV = [0, 0, 0, 0]; writeView(cam); raf = null;
+    }
+  }
+
   function fmt(p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }
 
   function line(p1, p2, cls) {
@@ -1023,10 +1064,9 @@
 
     g.innerHTML = out.join('');
 
-    var vx = -0.12 * S, vy = -0.12 * S;
-    var vw = SW + 0.12 * S + 0.34 * S;
-    var vh = SH + 0.12 * S + 0.30 * S;
-    svg.setAttribute('viewBox', vx.toFixed(1) + ' ' + vy.toFixed(1) + ' ' + vw.toFixed(1) + ' ' + vh.toFixed(1));
+    setView(-0.12 * S, -0.12 * S,
+            SW + 0.12 * S + 0.34 * S,
+            SH + 0.12 * S + 0.30 * S);
 
     var t = svg.querySelector('title');
     if (t) t.textContent = 'Plan of a room ' + W + ' by ' + D + ' millimetres holding ' +
