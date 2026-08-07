@@ -9,7 +9,8 @@
         @import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap');
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: #000000; min-height: 100vh; overflow: hidden; position: relative; }
+        body { background-color: #000000; min-height: 100vh; overflow: hidden; position: relative;
+               font-family: 'Outfit', 'General Sans', -apple-system, system-ui, sans-serif; }
 
         /* 1. Top gradient overlay */
         #top-gradient { position: fixed; top: -30vh; left: 0; width: 100vw; height: auto; display: block; z-index: 0; pointer-events: none; }
@@ -107,7 +108,18 @@
 
     <div class="footer-logo-wrap"><h2 class="footer-logo-text">Fluxwave</h2></div>
 
-    <div class="video-container"><video autoplay muted playsinline loop id="bg-video"><source src="./assets/flower.mp4" type="video/mp4">Your browser does not support the video tag.</video></div>
+    <div class="video-container"><video autoplay muted playsinline loop id="bg-video" preload="none" poster="./assets/flower-poster.jpg">Your browser does not support the video tag.</video></div>
+    <script>
+    /* One encode per screen class, picked before the fetch starts: a phone pulls
+       121 KB instead of the 8 MB master. The poster covers the gap either way. */
+    (function () {
+        var v = document.getElementById('bg-video');
+        var conn = navigator.connection || {};
+        var light = matchMedia('(max-width: 760px)').matches || conn.saveData === true;
+        v.src = './assets/' + (light ? 'flower-ld.mp4' : 'flower-hd.mp4');
+        v.load();
+    })();
+    </script>
 
     <a class="author-cta" href="https://t.me/smirnovarturr" target="_blank" rel="noopener noreferrer" aria-label="Want this? Message @smirnovarturr on Telegram">
         <span class="author-cta__label">Want this?</span>
