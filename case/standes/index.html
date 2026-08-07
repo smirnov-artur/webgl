@@ -292,6 +292,173 @@
   .steps .mono { color: var(--brass); padding-top: 0.15rem; }
   .steps b { display: block; color: var(--ink); font-weight: 600; letter-spacing: -0.005em; }
 
+  /* =======================================================================
+     THE RIG — the room laid out in the page, the way the real tool does it
+     ======================================================================= */
+
+  .rig {
+    margin: 1.5rem 0 0;
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .rig-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.4rem 1.5rem;
+    flex-wrap: wrap;
+    padding: 0.7rem clamp(0.85rem, 2vw, 1.15rem);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .rig-head p { margin: 0; }
+  .rig-head .live { color: var(--brass); }
+
+  .rig-view {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #05060A;
+    border-bottom: 1px solid var(--line);
+    touch-action: pan-y;          /* nothing here should ever eat a page scroll */
+  }
+
+  .rig-controls {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.9rem, 2vw, 1.5rem);
+    padding: clamp(0.95rem, 2vw, 1.25rem);
+  }
+
+  .rig-ctl { display: flex; flex-direction: column; gap: 0.3rem; }
+
+  .rig-ctl .lab {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .rig-ctl .val {
+    font-family: var(--f-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rig-ctl input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 20px;
+    margin: 0;
+    background: transparent;
+    cursor: ew-resize;
+  }
+
+  .rig-ctl input[type="range"]::-webkit-slider-runnable-track {
+    height: 2px;
+    background: var(--line-lit);
+  }
+
+  .rig-ctl input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px;
+    height: 13px;
+    margin-top: -5.5px;
+    border: 0;
+    background: var(--brass);
+    transform: rotate(45deg);     /* the same diamond as the wordmark */
+  }
+
+  .rig-ctl input[type="range"]::-moz-range-track { height: 2px; background: var(--line-lit); }
+
+  .rig-ctl input[type="range"]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border: 0;
+    border-radius: 0;
+    background: var(--brass);
+  }
+
+  .rig-ctl input[type="range"]:focus-visible { outline: 2px solid var(--brass); outline-offset: 4px; }
+
+  .rig-gauge { display: flex; border: 1px solid var(--line-lit); }
+
+  .rig-gauge button {
+    flex: 1 1 0;
+    border: 0;
+    border-left: 1px solid var(--line-lit);
+    background: transparent;
+    color: var(--mute);
+    font-family: var(--f-mono);
+    font-size: 0.688rem;
+    letter-spacing: 0.1em;
+    padding: 0.45rem 0.2rem;
+    cursor: pointer;
+  }
+
+  .rig-gauge button:first-child { border-left: 0; }
+  .rig-gauge button:hover { color: var(--ink); }
+  .rig-gauge button[aria-pressed="true"] { background: var(--brass); color: #10100C; }
+  .rig-gauge button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+  /* the running summary — this is the part the sales desk actually receives */
+  .rig-out {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+  }
+
+  .rig-out div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: clamp(0.75rem, 1.8vw, 1rem);
+    border-left: 1px solid var(--line);
+  }
+
+  .rig-out div:first-child { border-left: 0; }
+
+  .rig-out .num {
+    font-size: clamp(1.02rem, 1.9vw, 1.4rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rig-out .run .num { color: var(--brass); }
+
+  .rig-fine {
+    margin: 0;
+    padding: 0.9rem clamp(0.85rem, 2vw, 1.15rem) clamp(0.95rem, 2vw, 1.2rem);
+    border-top: 1px solid var(--line);
+    color: var(--dim);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .rig-fine code {
+    font-family: var(--f-mono);
+    font-size: 0.78rem;
+    color: var(--steel);
+  }
+
+  /* the generated plan */
+  #plan .room { fill: #0A0C10; stroke: var(--line-lit); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  #plan .grid { stroke: rgba(126, 151, 166, 0.09); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  #plan .bay  { fill: #1B222B; stroke: var(--steel); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  #plan .sep  { stroke: rgba(126, 151, 166, 0.45); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  #plan .dim  { stroke: var(--mute); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  #plan .wit  { stroke: var(--line-lit); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  #plan .arw  { fill: var(--mute); }
+  #plan text  { font-family: var(--f-mono); fill: var(--ink); letter-spacing: 0.05em; }
+  #plan .k { fill: var(--brass); }
+  #plan .warn { fill: var(--brass); }
+
   /* before → now ledger */
   .shift { margin: 0; }
 
@@ -445,6 +612,12 @@
     .shift .was::before { content: "was — "; color: var(--dim); }
     .shift .now { order: 0; }
     figcaption { display: block; }
+
+    .rig-controls { grid-template-columns: minmax(0, 1fr); }
+    .rig-out { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .rig-out div:nth-child(3) { border-left: 0; }
+    .rig-out div:nth-child(n + 3) { border-top: 1px solid var(--line); }
+    .rig-view { aspect-ratio: 4 / 3; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -525,6 +698,69 @@
         shelves, display cases, accessories, perforated panels — dragging rows until the
         aisles work.
       </p>
+
+      <!-- the same move, stripped to one bay type, so the paragraph is testable -->
+      <div class="rig">
+        <div class="rig-head mono">
+          <p class="live">Live — set the room</p>
+          <p>Plan view · racking</p>
+        </div>
+
+        <svg class="rig-view" id="plan" role="img" aria-labelledby="plan-t" preserveAspectRatio="xMidYMid meet">
+          <title id="plan-t">A plan of the room with rows of racking laid into it</title>
+        </svg>
+
+        <div class="rig-controls">
+          <div class="rig-ctl">
+            <label class="lab" for="in-w"><span class="mono">Room width</span><span class="val" id="out-w">6000 mm</span></label>
+            <input type="range" id="in-w" min="2000" max="14000" step="100" value="6000">
+          </div>
+          <div class="rig-ctl">
+            <label class="lab" for="in-d"><span class="mono">Room depth</span><span class="val" id="out-d">8000 mm</span></label>
+            <input type="range" id="in-d" min="2000" max="14000" step="100" value="8000">
+          </div>
+          <div class="rig-ctl">
+            <label class="lab" for="in-g"><span class="mono">Aisle</span><span class="val" id="out-g">1200 mm</span></label>
+            <input type="range" id="in-g" min="700" max="2500" step="50" value="1200">
+          </div>
+          <div class="rig-ctl" style="grid-column: 1 / -1">
+            <span class="lab"><span class="mono">Shelves per bay</span><span class="val" id="out-s">4</span></span>
+            <div class="rig-gauge" id="shelves" role="group" aria-label="Shelves per bay">
+              <button type="button" data-s="3" aria-pressed="false">3</button>
+              <button type="button" data-s="4" aria-pressed="true">4</button>
+              <button type="button" data-s="5" aria-pressed="false">5</button>
+              <button type="button" data-s="6" aria-pressed="false">6</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="rig-out">
+          <div>
+            <span class="num" id="out-rows">4</span>
+            <span class="mono">Rows</span>
+          </div>
+          <div>
+            <span class="num" id="out-bays">24</span>
+            <span class="mono">Bays</span>
+          </div>
+          <div>
+            <span class="num" id="out-shelves">96</span>
+            <span class="mono">Shelves</span>
+          </div>
+          <div class="run">
+            <span class="num" id="out-run">24.0</span>
+            <span class="mono">Run, m</span>
+          </div>
+        </div>
+
+        <p class="rig-fine">
+          <code>rows = ⌊(depth − aisle) ÷ (400 + aisle)⌋ · bays = ⌊width ÷ 1000⌋ per row</code><br>
+          A bay is 1000 × 400 × 1950 mm — the frame size showing in the top bar of the
+          production screen above. These four counts are what an enquiry carries; the real
+          configurator also takes display cases, accessories and perforated panels, prices the
+          lot, and sends the layout on as a drawing.
+        </p>
+      </div>
 
       <ol class="steps">
         <li>
@@ -645,6 +881,196 @@
   <span>Artur Smirnov — real-time 3D &amp; browser engineering</span>
   <a href="../../">smirnov-artur.github.io/webgl</a>
 </footer>
+
+<script>
+/* =========================================================================
+   THE RIG — the room, laid out from three numbers.
+   Rows are fitted to the depth the aisle leaves behind, bays are fitted to
+   the width, and the summary underneath is assembled from the same pass:
+   what the customer moves is what the sales desk receives. One bay type,
+   plan view only — the real tool does this in 3D with the whole catalogue.
+   ====================================================================== */
+(function () {
+  var svg = document.getElementById('plan');
+  if (!svg) return;
+
+  var BAY = 1000;    /* mm, frame width  — the size on the production screen */
+  var DEEP = 400;    /* mm, frame depth */
+
+  var P = { w: 6000, d: 8000, g: 1200, s: 4 };
+
+  var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  svg.appendChild(g);
+
+  function fmt(p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }
+
+  function line(p1, p2, cls) {
+    return '<line x1="' + p1[0].toFixed(1) + '" y1="' + p1[1].toFixed(1) +
+           '" x2="' + p2[0].toFixed(1) + '" y2="' + p2[1].toFixed(1) + '" class="' + cls + '"/>';
+  }
+
+  function rect(x, y, w, h, cls) {
+    return '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) +
+           '" height="' + h.toFixed(1) + '" class="' + cls + '"/>';
+  }
+
+  /* A plan gets turned so the long wall lies across the sheet. This is a view
+     rotation only — it never touches what fits, just which way it is read. */
+  var TR = false;
+  function T(x, y)  { return TR ? [y, x] : [x, y]; }
+  function TV(x, y) { return TR ? [y, x] : [x, y]; }
+
+  function trect(x, y, w, h, cls) {
+    return TR ? rect(y, x, h, w, cls) : rect(x, y, w, h, cls);
+  }
+
+  /* how much fits, given the aisle the customer is willing to give up */
+  function fit() {
+    var rows = Math.max(0, Math.floor((P.d - P.g) / (DEEP + P.g)));
+    var bays = Math.max(0, Math.floor(P.w / BAY));
+    return { rows: rows, bays: bays, total: rows * bays };
+  }
+
+  function build() {
+    var W = P.w, D = P.d, A = P.g;
+    var f = fit();
+    var S = Math.max(W, D);
+    TR = D > W;
+    var SW = TR ? D : W, SH = TR ? W : D;
+
+    var ah = 0.028 * S;
+    var fs = 0.042 * S;
+    var out = [];
+
+    out.push(rect(0, 0, SW, SH, 'room'));
+
+    /* a metre grid on the floor, so the room reads at scale */
+    var i;
+    for (i = BAY; i < SW; i += BAY) out.push(line([i, 0], [i, SH], 'grid'));
+    for (i = BAY; i < SH; i += BAY) out.push(line([0, i], [SW, i], 'grid'));
+
+    /* aisle, row, aisle, row … aisle — centred in whatever depth is left */
+    var used = f.rows * DEEP + (f.rows + 1) * A;
+    var y0 = f.rows ? (D - used) / 2 : 0;
+    var runW = f.bays * BAY;
+    var x0 = (W - runW) / 2;
+    var firstRowY = null;
+
+    for (i = 0; i < f.rows; i++) {
+      var y = y0 + A + i * (DEEP + A);
+      if (firstRowY === null) firstRowY = y;
+      out.push(trect(x0, y, runW, DEEP, 'bay'));
+      for (var b = 1; b < f.bays; b++) {
+        out.push(line(T(x0 + b * BAY, y), T(x0 + b * BAY, y + DEEP), 'sep'));
+      }
+    }
+
+    function arrow(tip, dx, dy) {
+      var bx = tip[0] + dx * ah, by = tip[1] + dy * ah;
+      var nx = -dy * ah * 0.34, ny = dx * ah * 0.34;
+      return '<polygon class="arw" points="' + fmt(tip) + ' ' +
+             fmt([bx + nx, by + ny]) + ' ' + fmt([bx - nx, by - ny]) + '"/>';
+    }
+
+    function dimension(p1, p2, off, key, val, labOff, anchor, witness) {
+      var q1 = [p1[0] + off[0], p1[1] + off[1]];
+      var q2 = [p2[0] + off[0], p2[1] + off[1]];
+      var ux = q2[0] - q1[0], uy = q2[1] - q1[1];
+      var len = Math.sqrt(ux * ux + uy * uy) || 1;
+      ux /= len; uy /= len;
+      var ol = Math.sqrt(off[0] * off[0] + off[1] * off[1]) || 1;
+      var ex = off[0] / ol, ey = off[1] / ol;
+
+      var s = '';
+      if (witness) {
+        s += line(p1, [q1[0] + ex * ah * 0.6, q1[1] + ey * ah * 0.6], 'wit') +
+             line(p2, [q2[0] + ex * ah * 0.6, q2[1] + ey * ah * 0.6], 'wit');
+      }
+
+      if (len < 2.8 * ah) {
+        /* too tight to hold the arrows — swing them outside, pointing in */
+        s += line([q1[0] - ux * ah * 1.7, q1[1] - uy * ah * 1.7],
+                  [q2[0] + ux * ah * 1.7, q2[1] + uy * ah * 1.7], 'dim') +
+             arrow(q1, -ux, -uy) + arrow(q2, ux, uy);
+      } else {
+        s += line(q1, q2, 'dim') + arrow(q1, ux, uy) + arrow(q2, -ux, -uy);
+      }
+
+      var mx = (q1[0] + q2[0]) / 2 + labOff[0];
+      var my = (q1[1] + q2[1]) / 2 + labOff[1];
+      s += '<text x="' + mx.toFixed(1) + '" y="' + my.toFixed(1) + '" font-size="' + fs.toFixed(1) +
+           '" text-anchor="' + anchor + '" dominant-baseline="middle">' +
+           '<tspan class="k">' + key + '</tspan> ' + val + '</text>';
+      return s;
+    }
+
+    var d = 0.10 * S;
+    out.push(dimension(T(0, D), T(W, D), TV(0, d), 'W', W,
+                       TR ? [ah * 0.9, 0] : [0, fs * 0.95], TR ? 'start' : 'middle', true));
+    out.push(dimension(T(W, 0), T(W, D), TV(d, 0), 'D', D,
+                       TR ? [0, fs * 0.95] : [ah * 0.9, 0], TR ? 'middle' : 'start', true));
+
+    /* the aisle is the number the whole layout argues about — annotate it in place */
+    if (f.rows) {
+      var ax = x0 + runW / 2;
+      out.push(dimension(T(ax, firstRowY - A), T(ax, firstRowY), [0, 0], 'aisle', A,
+                         TR ? [0, fs * 0.9] : [ah * 1.1, 0], TR ? 'middle' : 'start', false));
+    } else {
+      out.push('<text class="warn" x="' + (SW / 2).toFixed(1) + '" y="' + (SH / 2).toFixed(1) +
+               '" font-size="' + fs.toFixed(1) + '" text-anchor="middle" dominant-baseline="middle">' +
+               'No row fits at this aisle</text>');
+    }
+
+    g.innerHTML = out.join('');
+
+    var vx = -0.12 * S, vy = -0.12 * S;
+    var vw = SW + 0.12 * S + 0.34 * S;
+    var vh = SH + 0.12 * S + 0.30 * S;
+    svg.setAttribute('viewBox', vx.toFixed(1) + ' ' + vy.toFixed(1) + ' ' + vw.toFixed(1) + ' ' + vh.toFixed(1));
+
+    var t = svg.querySelector('title');
+    if (t) t.textContent = 'Plan of a room ' + W + ' by ' + D + ' millimetres holding ' +
+                           f.rows + (f.rows === 1 ? ' row' : ' rows') + ' of racking, ' +
+                           f.total + (f.total === 1 ? ' bay' : ' bays') + ', with a ' + A +
+                           ' millimetre aisle';
+  }
+
+  /* the running summary — the same pass the enquiry is built from */
+  function figures() {
+    var f = fit();
+    document.getElementById('out-rows').textContent = f.rows;
+    document.getElementById('out-bays').textContent = f.total;
+    document.getElementById('out-shelves').textContent = f.total * P.s;
+    document.getElementById('out-run').textContent = (f.total * BAY / 1000).toFixed(1);
+  }
+
+  function paint() { build(); figures(); }
+
+  [['in-w', 'w', 'out-w'], ['in-d', 'd', 'out-d'], ['in-g', 'g', 'out-g']].forEach(function (row) {
+    var input = document.getElementById(row[0]);
+    var read = document.getElementById(row[2]);
+    input.addEventListener('input', function () {
+      P[row[1]] = +input.value;
+      read.textContent = input.value + ' mm';
+      paint();
+    });
+  });
+
+  var pick = document.getElementById('shelves');
+  pick.addEventListener('click', function (ev) {
+    var btn = ev.target.closest('button');
+    if (!btn) return;
+    P.s = +btn.getAttribute('data-s');
+    [].forEach.call(pick.querySelectorAll('button'), function (b) {
+      b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+    });
+    document.getElementById('out-s').textContent = P.s;
+    figures();
+  });
+
+  paint();
+})();
+</script>
 
 </body>
 </html>
