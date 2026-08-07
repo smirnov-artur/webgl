@@ -610,6 +610,14 @@
     .job img { display: block; grid-column: 2; margin-top: 0.35rem; }
   }
 
+  @media (max-width: 460px) {
+    /* В две колонки приборная строка уже не помещается: обе подписи рвались
+       посреди себя, и живой счётчик кадров оставался на второй строке в виде
+       одинокого «60». Кладём их одна под другой — каждая влезает в строку. */
+    .hud { grid-template-columns: minmax(0, 1fr); }
+    .hud > :nth-child(3) { text-align: left; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after { animation: none !important; transition: none !important; }
