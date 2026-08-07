@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#07080A">
+<title>Standes — 3D shelving configurator · Artur Smirnov</title>
+<meta name="description" content="A shelving manufacturer's customers lay out their own room in the browser, check the layout in AR at full size, and send the factory a finished plan. Three.js, WebGL, WebXR.">
+
+<link rel="canonical" href="https://smirnov-artur.github.io/webgl/case/standes/">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="../../assets/icon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="../../assets/icon-180.png">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Artur Smirnov">
+<meta property="og:url" content="https://smirnov-artur.github.io/webgl/case/standes/">
+<meta property="og:title" content="Standes — 3D shelving configurator">
+<meta property="og:description" content="The buyer lays out their own room in the browser, checks it in AR at full size, and sends the factory a plan. Built with Three.js and WebXR.">
+<meta property="og:image" content="https://smirnov-artur.github.io/webgl/assets/og-standes.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Standes — 3D shelving configurator: a retail room laid out with racking in 3D">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Standes — 3D shelving configurator">
+<meta name="twitter:description" content="The buyer lays out their own room in the browser, checks it in AR at full size, and sends the factory a plan.">
+<meta name="twitter:image" content="https://smirnov-artur.github.io/webgl/assets/og-standes.jpg">
+
+<link rel="preload" href="../../assets/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../../assets/fonts/plexmono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+
+<style>
+  /* self-hosted latin subsets — same two faces as the front page */
+  @font-face {
+    font-family: "Archivo";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("../../assets/fonts/archivo-var-latin.woff2") format("woff2");
+  }
+  @font-face {
+    font-family: "IBM Plex Mono";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../../assets/fonts/plexmono-400-latin.woff2") format("woff2");
+  }
+
+  :root {
+    --void:    #07080A;
+    --surface: #0C0E11;
+    --raise:   #12151A;
+    --line:    #1D2229;
+    --line-lit:#2B323B;
+    --ink:     #EDEAE4;
+    --mute:    #8B9199;
+    --dim:     #5C636C;
+    --brass:   #D08B2C;
+    --steel:   #7E97A6;
+
+    --f-sans: "Archivo", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --f-mono: "IBM Plex Mono", "Cascadia Mono", ui-monospace, Consolas, monospace;
+
+    --edge: clamp(1.15rem, 4.5vw, 5rem);
+    --maxw: 1320px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--void);
+    color: var(--ink);
+    font-family: var(--f-sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* the sub-document marker: a brass rule pinned to the top edge */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: var(--brass);
+    z-index: 40;
+  }
+
+  a { color: inherit; }
+
+  ::selection { background: var(--brass); color: #10100C; }
+
+  .shell {
+    width: 100%;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 var(--edge);
+  }
+
+  .mono {
+    font-family: var(--f-mono);
+    font-size: 0.688rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+
+  /* =======================================================================
+     TOP BAR
+     ======================================================================= */
+
+  .bar {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    flex-wrap: wrap;
+    padding-top: clamp(1.4rem, 3vw, 2.2rem);
+  }
+
+  .mark {
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+  }
+
+  .mark i {
+    width: 9px;
+    height: 9px;
+    background: var(--brass);
+    display: block;
+    transform: rotate(45deg);
+    flex: none;
+  }
+
+  .back { text-decoration: none; }
+  .back:hover { color: var(--brass); }
+  .back .arw { display: inline-block; transition: transform 0.25s ease; }
+  .back:hover .arw { transform: translateX(-5px); }
+
+  a:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+
+  /* =======================================================================
+     MASTHEAD — blueprint grid behind the title, no shader here
+     ======================================================================= */
+
+  .masthead {
+    position: relative;
+    isolation: isolate;
+    padding: clamp(2.6rem, 8vw, 6rem) 0 clamp(1.6rem, 3vw, 2.4rem);
+  }
+
+  .masthead::before {
+    content: "";
+    position: absolute;
+    inset: -6rem 0 0 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, rgba(126, 151, 166, 0.13) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(126, 151, 166, 0.13) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(120% 90% at 18% 32%, #000 0%, transparent 68%);
+            mask-image: radial-gradient(120% 90% at 18% 32%, #000 0%, transparent 68%);
+  }
+
+  .eyebrow { margin: 0 0 clamp(0.9rem, 2vw, 1.4rem); }
+  .eyebrow b { color: var(--brass); font-weight: 400; }
+
+  h1 {
+    margin: 0;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 7.6vw, 5.8rem);
+    line-height: 0.9;
+    letter-spacing: -0.035em;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  h1 span { display: block; }
+  h1 .lit { color: var(--brass); }
+
+  .lead {
+    margin: clamp(1.2rem, 3vw, 2rem) 0 0;
+    font-size: clamp(1.12rem, 2vw, 1.55rem);
+    line-height: 1.35;
+    letter-spacing: -0.012em;
+    max-width: 30ch;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  .lead b { color: var(--brass); font-weight: 600; }
+
+  /* fact strip under the title */
+  .facts {
+    margin-top: clamp(1.6rem, 4vw, 2.6rem);
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem clamp(1rem, 3vw, 2.5rem);
+    padding: 0.85rem 0 0;
+  }
+
+  .facts div { display: flex; flex-direction: column; gap: 0.2rem; }
+  .facts b { color: var(--ink); font-weight: 500; letter-spacing: 0.02em; }
+
+  /* =======================================================================
+     SHOT
+     ======================================================================= */
+
+  figure.shot {
+    margin: clamp(1.6rem, 3.5vw, 2.4rem) 0 0;
+  }
+
+  figure.shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+    background: #05060A;
+    filter: saturate(0.95);
+  }
+
+  figcaption {
+    margin-top: 0.7rem;
+    color: var(--dim);
+    display: flex;
+    gap: 0.4rem 1.6rem;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  /* =======================================================================
+     THE CUT — problem, build, consequence
+     ======================================================================= */
+
+  .cut {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: clamp(1rem, 3vw, 3.5rem);
+    border-top: 1px solid var(--line);
+    padding: clamp(1.8rem, 4.5vw, 3.2rem) 0;
+    align-items: start;
+  }
+
+  .cut-head { position: sticky; top: clamp(1.4rem, 4vw, 2.6rem); }
+
+  .cut-head p { margin: 0 0 0.5rem; }
+
+  .cut-head h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 3vw, 2.3rem);
+    font-weight: 800;
+    letter-spacing: -0.028em;
+    text-transform: uppercase;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .cut-body > p {
+    margin: 0 0 1rem;
+    color: var(--mute);
+    font-size: clamp(1rem, 1.35vw, 1.1rem);
+    max-width: 62ch;
+  }
+
+  .cut-body > p:last-child { margin-bottom: 0; }
+  .cut-body b { color: var(--ink); font-weight: 500; }
+
+  /* enumerated build steps — hairline rows, not cards */
+  .steps { margin: 1.4rem 0 0; padding: 0; list-style: none; }
+
+  .steps li {
+    display: grid;
+    grid-template-columns: 2.4rem minmax(0, 1fr);
+    gap: 0.2rem 1rem;
+    border-top: 1px solid var(--line);
+    padding: 0.8rem 0;
+    color: var(--mute);
+  }
+
+  .steps li:last-child { border-bottom: 1px solid var(--line); }
+  .steps .mono { color: var(--brass); padding-top: 0.15rem; }
+  .steps b { display: block; color: var(--ink); font-weight: 600; letter-spacing: -0.005em; }
+
+  /* before → now ledger */
+  .shift { margin: 0; }
+
+  .shift > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 2.5rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.35rem 0.5rem;
+    border-top: 1px solid var(--line);
+    padding: 0.85rem 0;
+  }
+
+  .shift > div:last-child { border-bottom: 1px solid var(--line); }
+
+  .shift .was { color: var(--dim); }
+  .shift .now { color: var(--ink); }
+  .shift .arw { color: var(--brass); text-align: center; font-family: var(--f-mono); }
+
+  /* stack */
+  .stack-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0 0 1.1rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stack-list li {
+    border: 1px solid var(--line-lit);
+    padding: 0.4rem 0.7rem;
+    color: var(--ink);
+  }
+
+  /* =======================================================================
+     NEXT + CONTACT
+     ======================================================================= */
+
+  .next {
+    display: block;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: clamp(1.4rem, 3.4vw, 2.4rem) 0;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .next::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    height: 1px;
+    width: 0;
+    background: var(--brass);
+    transition: width 0.45s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  .next:hover::after { width: 100%; }
+
+  .next p { margin: 0 0 0.45rem; }
+
+  .next h3 {
+    margin: 0;
+    font-size: clamp(1.4rem, 3.2vw, 2.2rem);
+    font-weight: 800;
+    letter-spacing: -0.028em;
+    text-transform: uppercase;
+    line-height: 1;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .next:hover h3 { color: var(--brass); }
+  .next h3 .arw { transition: transform 0.25s ease; }
+  .next:hover h3 .arw { transform: translateX(8px); }
+  .next .sub { margin: 0.6rem 0 0; color: var(--mute); max-width: 58ch; }
+
+  .contact {
+    margin-top: clamp(2.6rem, 7vw, 5rem);
+    border-top: 1px solid var(--line-lit);
+    padding: clamp(1.8rem, 5vw, 3rem) 0 clamp(2rem, 5vw, 3.2rem);
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(1.2rem, 3vw, 3rem);
+    align-items: end;
+  }
+
+  .contact h2 {
+    margin: 0 0 0.9rem;
+    font-size: clamp(1.7rem, 3.8vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .handle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+    font-weight: 600;
+    color: var(--brass);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+  }
+
+  .handle:hover { border-bottom-color: var(--brass); }
+
+  .contact-meta { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 1.1rem 0 2.4rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.4rem 2rem;
+    flex-wrap: wrap;
+  }
+
+  footer a { text-decoration: none; }
+  footer a:hover { color: var(--brass); }
+
+  /* =======================================================================
+     NARROW
+     ======================================================================= */
+
+  @media (max-width: 900px) {
+    .cut { grid-template-columns: minmax(0, 1fr); }
+    .cut-head { position: static; }
+    .contact { grid-template-columns: minmax(0, 1fr); align-items: start; }
+    .lead { max-width: 40ch; }
+  }
+
+  @media (max-width: 640px) {
+    .facts { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .facts div { border-bottom: 1px solid var(--line); padding-bottom: 0.6rem; margin-bottom: 0.6rem; }
+    .facts div:last-child { border-bottom: 0; margin-bottom: 0; }
+
+    /* a 1200px-wide UI shrunk to a phone is a smudge — crop into the part that matters */
+    figure.shot img { aspect-ratio: 4 / 3; object-fit: cover; object-position: 62% 50%; }
+
+    .shift > div { grid-template-columns: minmax(0, 1fr); }
+    .shift .arw { display: none; }
+    .shift .was { order: 1; }
+    .shift .was::before { content: "was — "; color: var(--dim); }
+    .shift .now { order: 0; }
+    figcaption { display: block; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell bar">
+  <a class="mark" href="../../"><i aria-hidden="true"></i>Artur Smirnov</a>
+  <a class="back mono" href="../../"><span class="arw">←</span> Back to the work</a>
+</div>
+
+<header class="masthead shell">
+  <p class="eyebrow mono">Case · <b>Standes</b> · Shelving manufacturer</p>
+
+  <h1><span>3D shelving</span><span class="lit">configurator</span></h1>
+
+  <p class="lead">
+    The customer lays out their own room in the browser, checks it <b>in AR at full
+    size</b>, and sends the factory a finished plan.
+  </p>
+
+  <div class="facts mono">
+    <div><span>Client</span><b>Shelving manufacturer</b></div>
+    <div><span>What it is</span><b>3D product configurator</b></div>
+    <div><span>Where it runs</span><b>A browser tab · AR on a phone</b></div>
+  </div>
+
+  <figure class="shot">
+    <img src="../../assets/standes.jpg" width="1200" height="582" decoding="async"
+         alt="The Standes configurator: a retail room laid out with rows of racking in 3D, a parts catalogue down the left, and room dimensions with a running total across the top bar">
+    <figcaption class="mono">
+      <span>The working screen — catalogue, room, running total, 3D/2D toggle, AR and export</span>
+      <span>Production UI, in Russian</span>
+    </figcaption>
+  </figure>
+</header>
+
+<main class="shell">
+
+  <!-- ======================================================================
+       01 — PROBLEM
+       =================================================================== -->
+  <section class="cut" aria-labelledby="p-t">
+    <div class="cut-head">
+      <p class="mono">01 — The problem</p>
+      <h2 id="p-t">Every enquiry starts from a blank sheet</h2>
+    </div>
+    <div class="cut-body">
+      <p>
+        A customer arrives with the plan of their room and one question: <b>how many rows
+        fit in here, and what does it cost?</b> Nothing about that question is answerable
+        from a catalogue.
+      </p>
+      <p>
+        So a manager does it by hand. Read the dimensions out of an email, sketch a layout,
+        pick the units, count the shelves, price the lot, send it back, wait — then do it
+        again when the customer says the aisle is too narrow. It is the same half-day of
+        work for a serious order and for someone who is just checking a number.
+      </p>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       02 — WHAT I BUILT
+       =================================================================== -->
+  <section class="cut" aria-labelledby="b-t">
+    <div class="cut-head">
+      <p class="mono">02 — What I built</p>
+      <h2 id="b-t">The room, on their side of the table</h2>
+    </div>
+    <div class="cut-body">
+      <p>
+        A configurator that opens in a browser tab, with no install and no login. The
+        customer types the real dimensions of their room and fills it themselves — racking,
+        shelves, display cases, accessories, perforated panels — dragging rows until the
+        aisles work.
+      </p>
+
+      <ol class="steps">
+        <li>
+          <span class="mono">01</span>
+          <span><b>Set the room</b>Width, depth and height of the actual space, so everything placed inside is measured against it.</span>
+        </li>
+        <li>
+          <span class="mono">02</span>
+          <span><b>Fill it from the catalogue</b>Real products with real dimensions and codes, positioned in the scene rather than picked off a list.</span>
+        </li>
+        <li>
+          <span class="mono">03</span>
+          <span><b>Read it in 3D or as a plan</b>The same layout from two angles — a walk-around view, and the flat plan a fitter needs.</span>
+        </li>
+        <li>
+          <span class="mono">04</span>
+          <span><b>Stand it up in AR</b>On a phone the layout drops into the real room at full scale, so the aisle width is a thing you walk down, not a number you trust.</span>
+        </li>
+        <li>
+          <span class="mono">05</span>
+          <span><b>Send it on</b>The finished layout leaves as a schematic, a render and an itemised summary — one file the factory can quote from.</span>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       03 — WHAT CHANGED
+       =================================================================== -->
+  <section class="cut" aria-labelledby="c-t">
+    <div class="cut-head">
+      <p class="mono">03 — For the sales desk</p>
+      <h2 id="c-t">The enquiry arrives finished</h2>
+    </div>
+    <div class="cut-body">
+      <p>
+        Nothing here replaces the sales team. It moves the drawing work to the person who
+        actually knows the room, and hands the manager the result.
+      </p>
+
+      <div class="shift">
+        <div>
+          <span class="was">The room is described in an email thread</span>
+          <span class="arw" aria-hidden="true">→</span>
+          <span class="now">It arrives as a layout, drawn to size</span>
+        </div>
+        <div>
+          <span class="was">A manager sketches and prices each variant by hand</span>
+          <span class="arw" aria-hidden="true">→</span>
+          <span class="now">The total is already there, and it followed every change</span>
+        </div>
+        <div>
+          <span class="was">Fit problems surface at delivery</span>
+          <span class="arw" aria-hidden="true">→</span>
+          <span class="now">The customer walked the layout in AR before ordering</span>
+        </div>
+        <div>
+          <span class="was">Every browser costs the same half-day</span>
+          <span class="arw" aria-hidden="true">→</span>
+          <span class="now">A manager picks it up when there is a plan attached</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       04 — STACK
+       =================================================================== -->
+  <section class="cut" aria-labelledby="s-t">
+    <div class="cut-head">
+      <p class="mono">04 — Under it</p>
+      <h2 id="s-t">Built with</h2>
+    </div>
+    <div class="cut-body">
+      <ul class="stack-list mono">
+        <li>Three.js</li>
+        <li>WebGL</li>
+        <li>WebXR — AR</li>
+        <li>3D + 2D views</li>
+        <li>Live pricing</li>
+        <li>Layout export</li>
+      </ul>
+      <p>
+        The scene is Three.js over raw WebGL, held to an interactive frame rate on a mid-range
+        laptop and on a phone — a configurator that stutters is a configurator nobody finishes.
+        AR goes through <b>WebXR</b>, straight from the same page: no app, no store, no second
+        build of the catalogue. Export writes the schematic and the itemised summary out of the
+        same scene the customer was looking at, so what the factory receives and what they saw
+        cannot drift apart.
+      </p>
+    </div>
+  </section>
+
+  <a class="next" href="../ventprom/">
+    <p class="mono">Next case</p>
+    <h3><span>Ventprom — parametric duct fittings</span><span class="arw" aria-hidden="true">→</span></h3>
+    <p class="sub">A catalogue that isn't a list of products but a set of parameters: type the dimensions, the part draws itself, and the costed specification builds as you go.</p>
+  </a>
+
+</main>
+
+<section class="contact shell">
+  <div>
+    <h2>Got a product that has to be configured before it can be quoted?</h2>
+    <a class="handle" href="https://t.me/smirnovarturr" target="_blank" rel="noopener">
+      Telegram @smirnovarturr <span aria-hidden="true">→</span>
+    </a>
+  </div>
+
+  <div class="contact-meta mono">
+    <span>Currently available for contract work</span>
+    <span>Remote · UTC+3 — a full European day and US East Coast mornings</span>
+    <span>Usually a reply within the hour</span>
+  </div>
+</section>
+
+<footer class="shell mono">
+  <span>Artur Smirnov — real-time 3D &amp; browser engineering</span>
+  <a href="../../">smirnov-artur.github.io/webgl</a>
+</footer>
+
+</body>
+</html>

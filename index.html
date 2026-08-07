@@ -345,6 +345,23 @@
     margin-top: 0.25rem !important;
   }
 
+  .cfg-read {
+    align-self: start;
+    margin-top: 0.15rem;
+    color: var(--brass);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+  }
+
+  .cfg-read:hover { border-bottom-color: var(--brass); }
+  .cfg-read:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+  .cfg-read .arw { transition: transform 0.25s ease; }
+  .cfg-read:hover .arw { transform: translateX(5px); }
+
   /* =======================================================================
      DEMOS — deliberately uneven grid
      ======================================================================= */
@@ -701,6 +718,9 @@
             a sales rep.
           </p>
           <p class="mono cfg-spec">Three.js · 3D and 2D views · AR · live pricing · export</p>
+          <a class="cfg-read mono" href="case/standes/">
+            <span>Read the case</span><span class="arw" aria-hidden="true">→</span>
+          </a>
         </div>
       </article>
 
@@ -718,6 +738,9 @@
             each ending in a costed specification and a quote instead of a thread of emails.
           </p>
           <p class="mono cfg-spec">Parametric preview · dimension lines · costed spec</p>
+          <a class="cfg-read mono" href="case/ventprom/">
+            <span>Read the case</span><span class="arw" aria-hidden="true">→</span>
+          </a>
         </div>
       </article>
 
