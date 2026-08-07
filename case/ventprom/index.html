@@ -292,6 +292,169 @@
   .steps .mono { color: var(--brass); padding-top: 0.15rem; }
   .steps b { display: block; color: var(--ink); font-weight: 600; letter-spacing: -0.005em; }
 
+  /* =======================================================================
+     THE RIG — one shape of the real thing, generated live in the page
+     ======================================================================= */
+
+  .rig {
+    margin: 1.5rem 0 0;
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .rig-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.4rem 1.5rem;
+    flex-wrap: wrap;
+    padding: 0.7rem clamp(0.85rem, 2vw, 1.15rem);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .rig-head p { margin: 0; }
+  .rig-head .live { color: var(--brass); }
+
+  .rig-view {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #05060A;
+    border-bottom: 1px solid var(--line);
+    touch-action: pan-y;          /* nothing here should ever eat a page scroll */
+  }
+
+  .rig-controls {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.9rem, 2vw, 1.5rem);
+    padding: clamp(0.95rem, 2vw, 1.25rem);
+  }
+
+  .rig-ctl { display: flex; flex-direction: column; gap: 0.3rem; }
+
+  .rig-ctl .lab {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .rig-ctl .val {
+    font-family: var(--f-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rig-ctl input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 20px;
+    margin: 0;
+    background: transparent;
+    cursor: ew-resize;
+  }
+
+  .rig-ctl input[type="range"]::-webkit-slider-runnable-track {
+    height: 2px;
+    background: var(--line-lit);
+  }
+
+  .rig-ctl input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px;
+    height: 13px;
+    margin-top: -5.5px;
+    border: 0;
+    background: var(--brass);
+    transform: rotate(45deg);     /* the same diamond as the wordmark */
+  }
+
+  .rig-ctl input[type="range"]::-moz-range-track { height: 2px; background: var(--line-lit); }
+
+  .rig-ctl input[type="range"]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border: 0;
+    border-radius: 0;
+    background: var(--brass);
+  }
+
+  .rig-ctl input[type="range"]:focus-visible { outline: 2px solid var(--brass); outline-offset: 4px; }
+
+  .rig-gauge { display: flex; border: 1px solid var(--line-lit); }
+
+  .rig-gauge button {
+    flex: 1 1 0;
+    border: 0;
+    border-left: 1px solid var(--line-lit);
+    background: transparent;
+    color: var(--mute);
+    font-family: var(--f-mono);
+    font-size: 0.688rem;
+    letter-spacing: 0.1em;
+    padding: 0.45rem 0.2rem;
+    cursor: pointer;
+  }
+
+  .rig-gauge button:first-child { border-left: 0; }
+  .rig-gauge button:hover { color: var(--ink); }
+  .rig-gauge button[aria-pressed="true"] { background: var(--brass); color: #10100C; }
+  .rig-gauge button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+  .rig-out {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+  }
+
+  .rig-out div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: clamp(0.75rem, 1.8vw, 1rem);
+    border-left: 1px solid var(--line);
+  }
+
+  .rig-out div:first-child { border-left: 0; }
+
+  .rig-out .num {
+    font-size: clamp(1.02rem, 1.9vw, 1.4rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rig-out .cost .num { color: var(--brass); }
+
+  .rig-fine {
+    margin: 0;
+    padding: 0.9rem clamp(0.85rem, 2vw, 1.15rem) clamp(0.95rem, 2vw, 1.2rem);
+    border-top: 1px solid var(--line);
+    color: var(--dim);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .rig-fine code {
+    font-family: var(--f-mono);
+    font-size: 0.78rem;
+    color: var(--steel);
+  }
+
+  /* the generated drawing itself */
+  #duct .e   { stroke: var(--steel);   stroke-width: 1; vector-effect: non-scaling-stroke; }
+  #duct .eh  { stroke: var(--dim);     stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 5 5; }
+  #duct .dim { stroke: var(--mute);    stroke-width: 1; vector-effect: non-scaling-stroke; }
+  #duct .wit { stroke: var(--line-lit);stroke-width: 1; vector-effect: non-scaling-stroke; }
+  #duct .arw { fill: var(--mute); }
+  #duct text { font-family: var(--f-mono); fill: var(--ink); letter-spacing: 0.05em; }
+  #duct .k { fill: var(--brass); }
+
   /* before → now ledger */
   .shift { margin: 0; }
 
@@ -468,6 +631,12 @@
     .shift .was::before { content: "was — "; color: var(--dim); }
     .shift .now { order: 0; }
     figcaption { display: block; }
+
+    .rig-controls { grid-template-columns: minmax(0, 1fr); }
+    .rig-out { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .rig-out div:nth-child(3) { border-left: 0; }
+    .rig-out div:nth-child(n + 3) { border-top: 1px solid var(--line); }
+    .rig-view { aspect-ratio: 4 / 3; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -548,6 +717,68 @@
         library of ready models to pick from, because there couldn't be one — the geometry is
         generated from the parameters as they are entered, and redrawn on every keystroke.
       </p>
+
+      <!-- one shape of it, running here, so the paragraph above is testable -->
+      <div class="rig">
+        <div class="rig-head mono">
+          <p class="live">Live — drag a slider</p>
+          <p>Straight run · rectangular</p>
+        </div>
+
+        <svg class="rig-view" id="duct" role="img" aria-labelledby="duct-t" preserveAspectRatio="xMidYMid meet">
+          <title id="duct-t">A rectangular duct section drawn to the entered dimensions</title>
+        </svg>
+
+        <div class="rig-controls">
+          <div class="rig-ctl">
+            <label class="lab" for="in-a"><span class="mono">Width A</span><span class="val" id="out-a">500 mm</span></label>
+            <input type="range" id="in-a" min="100" max="1000" step="10" value="500">
+          </div>
+          <div class="rig-ctl">
+            <label class="lab" for="in-b"><span class="mono">Height B</span><span class="val" id="out-b">300 mm</span></label>
+            <input type="range" id="in-b" min="100" max="1000" step="10" value="300">
+          </div>
+          <div class="rig-ctl">
+            <label class="lab" for="in-l"><span class="mono">Length L</span><span class="val" id="out-l">1250 mm</span></label>
+            <input type="range" id="in-l" min="250" max="2000" step="50" value="1250">
+          </div>
+          <div class="rig-ctl" style="grid-column: 1 / -1">
+            <span class="lab"><span class="mono">Sheet gauge</span><span class="val" id="out-t">0.7 mm</span></span>
+            <div class="rig-gauge" id="gauge" role="group" aria-label="Sheet gauge">
+              <button type="button" data-t="0.5" aria-pressed="false">0.5</button>
+              <button type="button" data-t="0.7" aria-pressed="true">0.7</button>
+              <button type="button" data-t="0.9" aria-pressed="false">0.9</button>
+              <button type="button" data-t="1.2" aria-pressed="false">1.2</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="rig-out">
+          <div>
+            <span class="num" id="out-blank">1660</span>
+            <span class="mono">Blank width, mm</span>
+          </div>
+          <div>
+            <span class="num" id="out-area">2.08</span>
+            <span class="mono">Sheet, m²</span>
+          </div>
+          <div>
+            <span class="num" id="out-mass">11.4</span>
+            <span class="mono">Steel, kg</span>
+          </div>
+          <div class="cost">
+            <span class="num" id="out-cost">€20.51</span>
+            <span class="mono">Indicative</span>
+          </div>
+        </div>
+
+        <p class="rig-fine">
+          <code>blank = 2 × (A + B) + 60 mm seam · mass = blank × L × gauge × 7.85 g/cm³</code><br>
+          Geometry and mass are computed, not mocked up. The cost line multiplies that mass by a
+          placeholder €1.80/kg for galvanised sheet — the production tool prices against the
+          client's own rates, across the whole nomenclature, and adds connections and fittings.
+        </p>
+      </div>
 
       <ol class="steps">
         <li>
@@ -684,6 +915,173 @@
   <span>Artur Smirnov — real-time 3D &amp; browser engineering</span>
   <a href="../../">smirnov-artur.github.io/webgl</a>
 </footer>
+
+<script>
+/* =========================================================================
+   THE RIG — one family of the real configurator, cut down to a single shape.
+   A rectangular straight run is generated from three numbers, projected
+   axonometrically and drawn as an engineering view: the dimension lines are
+   part of the geometry, not decoration, and the metal is costed off the same
+   parameters. No library — the whole thing is smaller than one icon font.
+   ====================================================================== */
+(function () {
+  var svg = document.getElementById('duct');
+  if (!svg) return;
+
+  var P = { a: 500, b: 300, l: 1250, t: 0.7 };
+
+  var SEAM = 60;      /* mm of blank taken by the folded seam */
+  var RHO  = 7850;    /* kg/m³, steel */
+  var RATE = 1.80;    /* €/kg — a placeholder rate, called out under the panel */
+
+  var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  svg.appendChild(g);
+
+  /* length runs across the view, width recedes up and to the left */
+  function pr(u, v, w) { return [u - 0.45 * w, -(v + 0.30 * w)]; }
+
+  function fmt(p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }
+
+  function line(p1, p2, cls) {
+    return '<line x1="' + p1[0].toFixed(1) + '" y1="' + p1[1].toFixed(1) +
+           '" x2="' + p2[0].toFixed(1) + '" y2="' + p2[1].toFixed(1) + '" class="' + cls + '"/>';
+  }
+
+  function face(ps, fill) {
+    return '<polygon points="' + ps.map(fmt).join(' ') + '" fill="' + fill + '"/>';
+  }
+
+  function build() {
+    var A = P.a, B = P.b, L = P.l;
+    var C = function (u, v, w) { return pr(u, v, w); };
+
+    var box = [C(0,0,0), C(L,0,0), C(L,B,0), C(0,B,0), C(0,0,A), C(L,0,A), C(L,B,A), C(0,B,A)];
+    var xs = box.map(function (p) { return p[0]; });
+    var ys = box.map(function (p) { return p[1]; });
+    var minx = Math.min.apply(null, xs), maxx = Math.max.apply(null, xs);
+    var miny = Math.min.apply(null, ys), maxy = Math.max.apply(null, ys);
+    var S = Math.max(maxx - minx, maxy - miny);
+
+    var d  = 0.115 * S;   /* stand-off of the dimension line */
+    var ah = 0.032 * S;   /* arrow length */
+    var fs = 0.052 * S;   /* label size */
+
+    function arrow(tip, dx, dy) {
+      var bx = tip[0] + dx * ah, by = tip[1] + dy * ah;
+      var nx = -dy * ah * 0.34, ny = dx * ah * 0.34;
+      return '<polygon class="arw" points="' + fmt(tip) + ' ' +
+             fmt([bx + nx, by + ny]) + ' ' + fmt([bx - nx, by - ny]) + '"/>';
+    }
+
+    /* a real dimension: witness lines off the geometry, arrows, and the value */
+    function dimension(p1, p2, off, key, val, labOff, anchor) {
+      var q1 = [p1[0] + off[0], p1[1] + off[1]];
+      var q2 = [p2[0] + off[0], p2[1] + off[1]];
+      var ux = q2[0] - q1[0], uy = q2[1] - q1[1];
+      var len = Math.sqrt(ux * ux + uy * uy) || 1;
+      ux /= len; uy /= len;
+      var ol = Math.sqrt(off[0] * off[0] + off[1] * off[1]) || 1;
+      var ex = off[0] / ol, ey = off[1] / ol;
+
+      var s = line(p1, [q1[0] + ex * ah * 0.6, q1[1] + ey * ah * 0.6], 'wit') +
+              line(p2, [q2[0] + ex * ah * 0.6, q2[1] + ey * ah * 0.6], 'wit');
+
+      if (len < 2.8 * ah) {
+        /* too tight for arrows between the witness lines — put them outside
+           pointing in, the way the dimension would be drawn on paper */
+        s += line([q1[0] - ux * ah * 1.7, q1[1] - uy * ah * 1.7],
+                  [q2[0] + ux * ah * 1.7, q2[1] + uy * ah * 1.7], 'dim') +
+             arrow(q1, -ux, -uy) + arrow(q2, ux, uy);
+      } else {
+        s += line(q1, q2, 'dim') + arrow(q1, ux, uy) + arrow(q2, -ux, -uy);
+      }
+
+      var mx = (q1[0] + q2[0]) / 2 + labOff[0];
+      var my = (q1[1] + q2[1]) / 2 + labOff[1];
+      s += '<text x="' + mx.toFixed(1) + '" y="' + my.toFixed(1) + '" font-size="' + fs.toFixed(1) +
+           '" text-anchor="' + anchor + '" dominant-baseline="middle">' +
+           '<tspan class="k">' + key + '</tspan> ' + val + '</text>';
+      return s;
+    }
+
+    var out = [];
+
+    /* three faces catch the light differently — enough to read as a solid */
+    out.push(face([C(0,0,0), C(L,0,0), C(L,B,0), C(0,B,0)], '#12151A'));   /* front */
+    out.push(face([C(0,B,0), C(L,B,0), C(L,B,A), C(0,B,A)], '#181D24'));   /* top */
+    out.push(face([C(L,0,0), C(L,B,0), C(L,B,A), C(L,0,A)], '#0C0F13'));   /* open end */
+
+    /* the three edges meeting at the far bottom corner are behind the solid */
+    out.push(line(C(0,0,A), C(L,0,A), 'eh'));
+    out.push(line(C(0,0,A), C(0,B,A), 'eh'));
+    out.push(line(C(0,0,0), C(0,0,A), 'eh'));
+
+    out.push(line(C(0,0,0), C(L,0,0), 'e'));
+    out.push(line(C(0,B,0), C(L,B,0), 'e'));
+    out.push(line(C(0,B,A), C(L,B,A), 'e'));
+    out.push(line(C(0,0,0), C(0,B,0), 'e'));
+    out.push(line(C(L,0,0), C(L,B,0), 'e'));
+    out.push(line(C(L,0,A), C(L,B,A), 'e'));
+    out.push(line(C(0,B,0), C(0,B,A), 'e'));
+    out.push(line(C(L,0,0), C(L,0,A), 'e'));
+    out.push(line(C(L,B,0), C(L,B,A), 'e'));
+
+    out.push(dimension(C(0,0,0), C(L,0,0), [0, d], 'L', L, [0, fs * 0.95], 'middle'));
+    out.push(dimension(C(L,0,0), C(L,B,0), [d, 0], 'B', B, [ah * 0.9, 0], 'start'));
+    out.push(dimension(C(0,B,0), C(0,B,A), [0.555 * d, -0.832 * d], 'A', A,
+                       [0.555 * fs * 1.05, -0.832 * fs * 1.05], 'middle'));
+
+    g.innerHTML = out.join('');
+
+    /* pad asymmetrically — the labels only stick out where the dimensions are */
+    var vx = minx - 0.22 * S;
+    var vy = miny - 0.30 * S;
+    var vw = (maxx - minx) + 0.22 * S + 0.36 * S;
+    var vh = (maxy - miny) + 0.30 * S + 0.30 * S;
+    svg.setAttribute('viewBox', vx.toFixed(1) + ' ' + vy.toFixed(1) + ' ' + vw.toFixed(1) + ' ' + vh.toFixed(1));
+
+    var t = svg.querySelector('title');
+    if (t) t.textContent = 'A rectangular duct section, ' + A + ' by ' + B +
+                           ' millimetres, ' + L + ' millimetres long, drawn with its dimension lines';
+  }
+
+  function figures() {
+    var blank = 2 * (P.a + P.b) + SEAM;              /* mm across the flat sheet */
+    var area  = blank * P.l / 1e6;                   /* m² */
+    var mass  = area * (P.t / 1000) * RHO;           /* kg */
+    document.getElementById('out-blank').textContent = Math.round(blank);
+    document.getElementById('out-area').textContent  = area.toFixed(2);
+    document.getElementById('out-mass').textContent  = mass.toFixed(1);
+    document.getElementById('out-cost').textContent  = '€' + (mass * RATE).toFixed(2);
+  }
+
+  function paint() { build(); figures(); }
+
+  [['in-a', 'a', 'out-a'], ['in-b', 'b', 'out-b'], ['in-l', 'l', 'out-l']].forEach(function (row) {
+    var input = document.getElementById(row[0]);
+    var read = document.getElementById(row[2]);
+    input.addEventListener('input', function () {
+      P[row[1]] = +input.value;
+      read.textContent = input.value + ' mm';
+      paint();
+    });
+  });
+
+  var gauge = document.getElementById('gauge');
+  gauge.addEventListener('click', function (ev) {
+    var btn = ev.target.closest('button');
+    if (!btn) return;
+    P.t = +btn.getAttribute('data-t');
+    [].forEach.call(gauge.querySelectorAll('button'), function (b) {
+      b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+    });
+    document.getElementById('out-t').textContent = P.t.toFixed(1) + ' mm';
+    figures();
+  });
+
+  paint();
+})();
+</script>
 
 </body>
 </html>
