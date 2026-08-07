@@ -8,14 +8,25 @@
 <title>Artur Smirnov — real-time 3D for the browser</title>
 <meta name="description" content="Freelance WebGL developer. Three.js and hand-written GLSL: 3D product configurators, interactive sites, and the engineering logic behind them. Five live demos.">
 
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2307080A'/%3E%3Cpath d='M6 22 L16 8 L26 22' fill='none' stroke='%23D08B2C' stroke-width='2.5'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://smirnov-artur.github.io/webgl/">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="assets/icon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
 
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="Artur Smirnov">
 <meta property="og:url" content="https://smirnov-artur.github.io/webgl/">
 <meta property="og:title" content="Artur Smirnov — real-time 3D for the browser">
-<meta property="og:description" content="Three.js and hand-written GLSL: 3D product configurators, interactive sites, and the engineering logic behind them.">
-<meta property="og:image" content="https://smirnov-artur.github.io/webgl/assets/aurum.jpg">
+<meta property="og:description" content="Three.js and hand-written GLSL: 3D product configurators, interactive sites, and the engineering logic behind them. Five live demos.">
+<meta property="og:image" content="https://smirnov-artur.github.io/webgl/assets/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Real-time 3D for the browser — a live GLSL contour field behind the title">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Artur Smirnov — real-time 3D for the browser">
+<meta name="twitter:description" content="Three.js and hand-written GLSL: 3D product configurators, interactive sites, and the engineering logic behind them.">
+<meta name="twitter:image" content="https://smirnov-artur.github.io/webgl/assets/og.jpg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -264,6 +275,62 @@
   .row-do p b { color: var(--ink); font-weight: 500; }
 
   /* =======================================================================
+     CONFIGURATORS — alternating slabs, the proof for manufacturers
+     ======================================================================= */
+
+  .cfg {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(1rem, 3vw, 2.6rem);
+    align-items: center;
+    border-top: 1px solid var(--line);
+    padding: clamp(1.4rem, 3.4vw, 2.6rem) 0;
+  }
+
+  .cfg:first-child { border-top: 0; padding-top: 0; }
+  .cfg:last-child { border-bottom: 1px solid var(--line); }
+
+  /* flip every second one so the eye zig-zags down the page */
+  .cfg:nth-child(even) .cfg-shot { order: 2; }
+
+  .cfg-shot {
+    margin: 0;
+    border: 1px solid var(--line);
+    background: #05060A;
+    overflow: hidden;
+    line-height: 0;
+  }
+
+  .cfg-shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: saturate(0.95);
+  }
+
+  .cfg-body { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .cfg-body h3 {
+    margin: 0;
+    font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+  }
+
+  .cfg-body p { margin: 0; color: var(--mute); }
+  .cfg-body p b { color: var(--ink); font-weight: 500; }
+
+  .cfg-name { color: var(--brass) !important; }
+
+  .cfg-spec {
+    color: var(--dim) !important;
+    padding-top: 0.35rem;
+    border-top: 1px solid var(--line);
+    margin-top: 0.25rem !important;
+  }
+
+  /* =======================================================================
      DEMOS — deliberately uneven grid
      ======================================================================= */
 
@@ -490,6 +557,8 @@
     .hud > :nth-child(2) { display: none; }
     .demo:nth-child(n) { grid-column: span 12; }
     .demo:nth-child(5) .thumb { aspect-ratio: 16 / 9; }
+    .cfg { grid-template-columns: minmax(0, 1fr); }
+    .cfg:nth-child(even) .cfg-shot { order: 0; }
     .contact { grid-template-columns: minmax(0, 1fr); align-items: start; }
     #peek { display: none; }
   }
@@ -591,11 +660,79 @@
   </section>
 
   <!-- ======================================================================
+       PRODUCT CONFIGURATORS
+       =================================================================== -->
+  <section class="band shell" aria-labelledby="cfg-t">
+    <div class="band-head">
+      <p class="mono">02 — For manufacturers</p>
+      <h2 id="cfg-t">Configurators that quote the job</h2>
+      <p class="mono">In production</p>
+    </div>
+
+    <div class="cfgs">
+
+      <article class="cfg">
+        <figure class="cfg-shot">
+          <img src="assets/standes.jpg" width="1200" height="675" loading="lazy" decoding="async"
+               alt="Standes: a retail room laid out with shelving units in 3D, catalogue on the left and a running quote on the right">
+        </figure>
+        <div class="cfg-body">
+          <p class="mono cfg-name">Standes</p>
+          <h3>3D shelving configurator</h3>
+          <p>
+            The customer measures out the room, drops in shelving, shelves and display cases,
+            and the quote follows every change. The finished layout opens in <b>AR</b> on a
+            phone, renders to an image, or goes to the factory as a brief — without a call to
+            a sales rep.
+          </p>
+          <p class="mono cfg-spec">Three.js · 3D and 2D views · AR · live pricing · export</p>
+        </div>
+      </article>
+
+      <article class="cfg">
+        <figure class="cfg-shot">
+          <img src="assets/ventprom.jpg" width="1200" height="605" loading="lazy" decoding="async"
+               alt="Ventprom: a duct fitting drawn to the entered dimensions with dimension lines, beside the input form and price">
+        </figure>
+        <div class="cfg-body">
+          <p class="mono cfg-name">Ventprom</p>
+          <h3>Parametric duct fittings</h3>
+          <p>
+            Dimensions, material and connection type go in; the part redraws with its
+            <b>dimension lines</b> as you type. Bends, reducers, tees, saddles and cowls, each
+            ending in a costed specification and a quote instead of a thread of emails.
+          </p>
+          <p class="mono cfg-spec">Parametric preview · dimension lines · costed spec</p>
+        </div>
+      </article>
+
+      <article class="cfg">
+        <figure class="cfg-shot">
+          <img src="assets/ventmarket.jpg" width="1200" height="600" loading="lazy" decoding="async"
+               alt="Ventmarket: an online fan selection screen where the engineer sets an operating point">
+        </figure>
+        <div class="cfg-body">
+          <p class="mono cfg-name">Ventmarket</p>
+          <h3>Selection by operating point</h3>
+          <p>
+            The engineer enters airflow and total pressure. The system picks the unit, draws
+            the curve through the <b>operating point</b> and builds the order around it —
+            across a 400-unit catalogue and roughly 20,000 polynomial curves, with acoustics,
+            drive and cost of ownership alongside.
+          </p>
+          <p class="mono cfg-spec">400+ units · ~20,000 curves · order, quote, CRM handoff</p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ======================================================================
        DEMOS
        =================================================================== -->
   <section class="band shell" aria-labelledby="demo-t">
     <div class="band-head">
-      <p class="mono">02 — Live</p>
+      <p class="mono">03 — Live</p>
       <h2 id="demo-t">Five things to open</h2>
       <p class="mono">Click, drag, scroll — they run</p>
     </div>
@@ -612,7 +749,7 @@
             <h3>Aurum</h3>
             <span class="mono">GLSL · scroll</span>
           </div>
-          <p>A bronze sculpture rendered on raw shaders. The camera orbits a full 360° as you scroll, lighting and grain resolved per pixel.</p>
+          <p>A bronze sculpture rendered on raw shaders. The camera orbits a full 360° as you scroll, with the lighting and the grain computed per pixel.</p>
           <span class="go mono"><span>Open</span><span class="arw">→</span></span>
         </div>
       </a>
@@ -685,55 +822,31 @@
        =================================================================== -->
   <section class="band shell" aria-labelledby="work-t">
     <div class="band-head">
-      <p class="mono">03 — Selected work</p>
+      <p class="mono">04 — Selected work</p>
       <h2 id="work-t">Shipped, in production</h2>
       <p class="mono">Hover for a look</p>
     </div>
 
     <div class="index" id="index">
 
-      <article class="job" data-peek="assets/standes.jpg">
-        <p class="mono">01</p>
-        <h3>Standes</h3>
-        <p>A 3D shelving configurator: set the room, place the units, watch the price follow, then export to AR or send the layout as a brief.</p>
-        <p class="mono tags">Three.js · configurator</p>
-        <img src="assets/standes.jpg" loading="lazy" alt="Standes: a retail room laid out with shelving in 3D, catalogue and running quote alongside">
-      </article>
-
-      <article class="job" data-peek="assets/ventprom.jpg">
-        <p class="mono">02</p>
-        <h3>Ventprom</h3>
-        <p>Parametric duct fittings. Enter the dimensions, watch the part redraw with its dimension lines, leave with a costed quote.</p>
-        <p class="mono tags">Parametric · quoting</p>
-        <img src="assets/ventprom.jpg" loading="lazy" alt="Ventprom: a duct fitting drawn to entered dimensions with dimension lines and a live price panel">
-      </article>
-
       <article class="job" data-peek="assets/dios.jpg">
-        <p class="mono">03</p>
+        <p class="mono">01</p>
         <h3>Dios+</h3>
         <p>A fleet globe: ships and aircraft moving along great-circle routes to 28 cities, on NASA textures with a cloud layer and atmospheric halo.</p>
         <p class="mono tags">Three.js · globe</p>
         <img src="assets/dios.jpg" loading="lazy" alt="Dios+: a 3D globe with cargo ships and aircraft on great-circle routes between world cities">
       </article>
 
-      <article class="job" data-peek="assets/ventmarket.jpg">
-        <p class="mono">04</p>
-        <h3>Ventmarket</h3>
-        <p>Selection by operating point: enter airflow and pressure, get the unit, the curve through the point, and the order built around it — 400+ units, ~20,000 polynomial curves.</p>
-        <p class="mono tags">Domain logic</p>
-        <img src="assets/ventmarket.jpg" loading="lazy" alt="Ventmarket: an online fan selection screen driven by an operating point">
-      </article>
-
       <article class="job" data-peek="assets/srez.jpg">
-        <p class="mono">05</p>
+        <p class="mono">02</p>
         <h3>Srez</h3>
-        <p>A materials catalogue you can read with your hands: drag a raking light across the coating and the relief comes up, the way a plasterer checks a wall.</p>
+        <p>A materials catalogue that behaves like the wall: drag a raking light across the coating and the relief comes up, the way a plasterer checks a surface.</p>
         <p class="mono tags">Interaction · art direction</p>
         <img src="assets/srez.jpg" loading="lazy" alt="Srez: a decorative coating shown under a movable raking light that reveals its relief">
       </article>
 
       <article class="job" data-peek="assets/vertro.jpg">
-        <p class="mono">06</p>
+        <p class="mono">03</p>
         <h3>Vertro</h3>
         <p>A desktop engineering suite pulled out of VB6 and Access and rebuilt for the web: nine calculation modules, 63 tables, 3,471 records, one URL.</p>
         <p class="mono tags">Legacy migration</p>
@@ -743,9 +856,9 @@
     </div>
 
     <p class="also">
-      Also on the shelf: computer-vision overlays for live streams, spaced-repetition
-      learning platforms, a Spring Boot backend with 53 endpoints, and a speech-synthesis
-      model. Happy to walk through any of it.
+      Also built: computer-vision overlays for live streams, spaced-repetition learning
+      platforms, a Spring Boot backend with 53 endpoints, and a speech-synthesis model.
+      Happy to walk through any of it.
     </p>
   </section>
 
@@ -785,7 +898,7 @@
 
 <footer class="shell mono">
   <span>Artur Smirnov — real-time 3D &amp; browser engineering</span>
-  <span>Built with no framework</span>
+  <span>No framework, no build step</span>
 </footer>
 
 <img id="peek" alt="" aria-hidden="true">
