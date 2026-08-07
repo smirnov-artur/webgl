@@ -190,6 +190,14 @@
   h1 span { display: block; }
   h1 .lit { color: var(--brass); }
 
+  /* CONFIGURATOR — двенадцать знаков, и ниже 507px кегль виснет на нижней
+     границе clamp (41.6px). На 320 слово в неё не влезает: строка выпирала
+     за экран и давала горизонтальную прокрутку всей странице. Ниже 360px
+     ведём кегль по ширине окна; на 360 это те же ~41.4px, стыка не видно. */
+  @media (max-width: 360px) {
+    h1 { font-size: clamp(2rem, 11.5vw, 2.6rem); }
+  }
+
   .lead {
     margin: clamp(1.2rem, 3vw, 2rem) 0 0;
     font-size: clamp(1.12rem, 2vw, 1.55rem);
