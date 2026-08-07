@@ -1,0 +1,1137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#05060A">
+<title>Graded Gyroid — a lattice ray-marched from a distance field</title>
+<meta name="description" content="A graded triply-periodic minimal surface, sphere-traced in real time from hand-written GLSL. No mesh, no textures, no model file. Live section cut, chromatic dispersion, custom bloom chain.">
+
+<link rel="canonical" href="https://smirnov-artur.github.io/webgl/lattice/">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="../assets/icon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="../assets/icon-180.png">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Artur Smirnov">
+<meta property="og:url" content="https://smirnov-artur.github.io/webgl/lattice/">
+<meta property="og:title" content="Graded Gyroid — a lattice ray-marched from a distance field">
+<meta property="og:description" content="Sphere-traced in one pass from hand-written GLSL. No mesh, no textures, no model file — live section cut and a custom post chain.">
+<meta property="og:image" content="https://smirnov-artur.github.io/webgl/assets/og-lattice.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Graded Gyroid — a lattice ray-marched from a distance field">
+<meta name="twitter:description" content="Sphere-traced in one pass from hand-written GLSL. No mesh, no textures, no model file.">
+<meta name="twitter:image" content="https://smirnov-artur.github.io/webgl/assets/og-lattice.jpg">
+
+<link rel="preload" href="../assets/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/plexmono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+
+<style>
+@font-face{
+  font-family:"Archivo"; font-style:normal; font-weight:100 900; font-display:swap;
+  src:url("../assets/fonts/archivo-var-latin.woff2") format("woff2");
+}
+@font-face{
+  font-family:"IBM Plex Mono"; font-style:normal; font-weight:400; font-display:swap;
+  src:url("../assets/fonts/plexmono-400-latin.woff2") format("woff2");
+}
+
+:root{
+  --void:#05060A;
+  --ink:#EFECE5;
+  --mute:#7C848F;
+  --dim:#4A515B;
+  --line:rgba(233,230,223,.14);
+  --hot:#FF8A3D;
+  --steel:#9FB6C8;
+  --f-sans:"Archivo","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono","Cascadia Mono",ui-monospace,Consolas,monospace;
+  --edge:clamp(1.15rem,3.6vw,3.25rem);
+  --top:clamp(1rem,2.4vw,1.75rem);
+}
+
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--void); color:var(--ink);
+  font-family:var(--f-sans); font-size:16px; line-height:1.5;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  overflow:hidden; overscroll-behavior:none;
+}
+a{color:inherit; text-decoration:none;}
+
+#gl{
+  position:fixed; inset:0; width:100%; height:100%; display:block;
+  touch-action:none; z-index:0; cursor:grab;
+}
+#gl.dragging{cursor:grabbing;}
+
+/* ---------- boot gate ---------- */
+.boot{
+  position:fixed; inset:0; z-index:40; background:var(--void);
+  display:flex; align-items:center; justify-content:center;
+  transition:opacity .55s ease .1s, visibility 0s linear .66s;
+}
+.boot.gone{opacity:0; visibility:hidden;}
+.boot span{
+  font-family:var(--f-mono); font-size:.66rem; letter-spacing:.24em;
+  text-transform:uppercase; color:var(--dim);
+  animation:pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+
+/* ---------- overlay ---------- */
+.ui{
+  position:fixed; inset:0; z-index:10; pointer-events:none;
+  display:flex; flex-direction:column;
+  padding:var(--top) var(--edge) clamp(1rem,2.4vw,1.75rem);
+}
+.ui > *{flex:none;}
+.ui a,.ui input,.ui button{pointer-events:auto;}
+
+.mono{
+  font-family:var(--f-mono); font-size:.625rem; letter-spacing:.19em;
+  text-transform:uppercase; color:var(--mute); line-height:1.6;
+}
+
+/* header */
+.bar{display:flex; justify-content:space-between; align-items:baseline; gap:1rem;}
+.bar .brand{color:var(--ink); opacity:.82; transition:opacity .25s;}
+.bar .brand:hover{opacity:1;}
+.bar .brand b{font-weight:400; color:var(--mute);}
+.bar .idx{color:#5E6670; white-space:nowrap;}
+
+/* middle */
+.mid{flex:1 1 auto; display:flex; align-items:center; min-height:0; gap:2rem;}
+.lede{width:min(47%,34rem); flex:none;}
+#stage{flex:1 1 auto; align-self:stretch; min-width:0;}
+
+.eyebrow{
+  display:flex; align-items:center; gap:.7em; margin:0 0 clamp(.85rem,1.6vw,1.4rem);
+  color:var(--steel);
+}
+.eyebrow::before{content:""; width:2.2rem; height:1px; background:currentColor; opacity:.5; flex:none;}
+
+h1{
+  margin:0; font-weight:640;
+  font-size:clamp(3.05rem,10.4vw,9.6rem);
+  line-height:.855; letter-spacing:-.052em;
+  text-transform:uppercase;
+  color:var(--ink);
+}
+h1 em{
+  font-style:normal; display:block;
+  color:transparent;
+  -webkit-text-stroke:1px rgba(239,236,229,.42);
+}
+.deck{
+  margin:clamp(1.1rem,2.2vw,1.9rem) 0 0; max-width:31em;
+  font-size:clamp(.9rem,1.06vw,1.03rem); line-height:1.62;
+  color:#B9BDC4; letter-spacing:-.005em; font-weight:350;
+}
+.deck b{color:var(--ink); font-weight:520;}
+.cta{
+  display:inline-flex; align-items:center; gap:.55em;
+  margin-top:clamp(1.2rem,2.4vw,2rem);
+  font-family:var(--f-mono); font-size:.625rem; letter-spacing:.19em; text-transform:uppercase;
+  color:var(--ink); padding:.72em 1.05em; border:1px solid var(--line);
+  transition:border-color .28s, background-color .28s, color .28s;
+}
+.cta:hover{border-color:var(--hot); color:var(--hot); background:rgba(255,138,61,.055);}
+.cta i{font-style:normal; transition:transform .28s;}
+.cta:hover i{transform:translateX(.25em);}
+
+/* footer */
+.foot{display:flex; justify-content:space-between; align-items:flex-end; gap:clamp(1rem,3vw,3rem);}
+
+.specs{display:grid; grid-template-columns:auto auto; gap:.05rem .95rem; align-content:end;}
+.specs dt{color:#5E6670;}
+.specs dd{margin:0; color:var(--mute); font-variant-numeric:tabular-nums;}
+.specs dd u{text-decoration:none; color:var(--steel);}
+
+.hint{color:var(--dim); text-align:center; align-self:flex-end; padding-bottom:.15rem;}
+.hint span{white-space:nowrap;}
+.hint span + span{margin-left:1.4rem;}
+
+/* controls */
+.panel{display:grid; gap:.72rem; min-width:12.5rem; max-width:15rem;}
+.ctl{display:grid; grid-template-columns:1fr auto; align-items:center; gap:.15rem .6rem;}
+.ctl label{
+  font-family:var(--f-mono); font-size:.625rem; letter-spacing:.19em;
+  text-transform:uppercase; color:var(--mute);
+}
+.ctl output{
+  font-family:var(--f-mono); font-size:.625rem; letter-spacing:.1em;
+  color:var(--steel); font-variant-numeric:tabular-nums;
+}
+.ctl input{
+  grid-column:1/-1; -webkit-appearance:none; appearance:none;
+  width:100%; height:14px; margin:.1rem 0 0; background:transparent; cursor:ew-resize;
+}
+.ctl input::-webkit-slider-runnable-track{height:1px; background:var(--line);}
+.ctl input::-moz-range-track{height:1px; background:var(--line);}
+.ctl input::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none;
+  width:1px; height:13px; margin-top:-6px; background:var(--ink); border:0; border-radius:0;
+  box-shadow:0 0 0 3px rgba(5,6,10,.9);
+}
+.ctl input::-moz-range-thumb{
+  width:1px; height:13px; background:var(--ink); border:0; border-radius:0;
+}
+.ctl input:focus-visible{outline:none;}
+.ctl input:focus-visible::-webkit-slider-thumb{background:var(--hot); box-shadow:0 0 0 3px rgba(5,6,10,.9),0 0 10px var(--hot);}
+.ctl input:focus-visible::-moz-range-thumb{background:var(--hot);}
+
+/* crop marks */
+.crop{position:fixed; z-index:5; width:11px; height:11px; pointer-events:none; opacity:.5;}
+.crop::before,.crop::after{content:""; position:absolute; background:var(--line);}
+.crop::before{width:11px; height:1px;}
+.crop::after{width:1px; height:11px;}
+.crop.tl{top:calc(var(--top) - 6px); left:calc(var(--edge) - 10px);}
+.crop.tr{top:calc(var(--top) - 6px); right:calc(var(--edge) - 10px);}
+.crop.tr::before,.crop.tr::after{right:0;}
+.crop.bl{bottom:calc(var(--top) - 6px); left:calc(var(--edge) - 10px);}
+.crop.bl::before,.crop.bl::after{bottom:0;}
+.crop.br{bottom:calc(var(--top) - 6px); right:calc(var(--edge) - 10px);}
+.crop.br::before,.crop.br::after{bottom:0; right:0;}
+
+/* entrance */
+.rise{opacity:0; transform:translateY(14px); transition:opacity .85s cubic-bezier(.16,1,.3,1), transform .85s cubic-bezier(.16,1,.3,1);}
+body.ready .rise{opacity:1; transform:none;}
+body.ready .d1{transition-delay:.06s}
+body.ready .d2{transition-delay:.15s}
+body.ready .d3{transition-delay:.26s}
+body.ready .d4{transition-delay:.37s}
+body.ready .d5{transition-delay:.48s}
+body.ready .d6{transition-delay:.58s}
+body.ready .crop{transition:opacity .9s ease .7s;}
+.crop{opacity:0}
+body.ready .crop{opacity:.5}
+
+/* fallback */
+.nogl{
+  position:fixed; inset:0; z-index:60; display:none; place-items:center; text-align:center;
+  padding:2rem; background:var(--void);
+}
+body.nowebgl .nogl{display:grid;}
+body.nowebgl .ui,body.nowebgl .boot{display:none;}
+
+/* ---------- narrow ---------- */
+@media (max-width:860px), (orientation:portrait) and (max-width:1024px){
+  .mid{flex-direction:column; align-items:stretch; gap:0;}
+  .lede{width:100%; flex:none; padding-top:clamp(1.5rem,6vw,3rem);}
+  #stage{width:100%; min-height:0;}
+  h1{font-size:clamp(2.9rem,15.5vw,5.4rem); letter-spacing:-.045em;}
+  .deck{font-size:.84rem; max-width:28em;}
+  .deck .hide-s{display:none;}
+  .cta{margin-top:1.1rem;}
+  .foot{flex-direction:column; align-items:stretch; gap:1.1rem;}
+  .panel{max-width:none; min-width:0; grid-template-columns:1fr 1fr 1fr; gap:.5rem .9rem;}
+  .specs{grid-template-columns:repeat(3,auto) ; justify-content:space-between; gap:.05rem .6rem;}
+  .specs dt{grid-row:1;}
+  .specs dd{grid-row:2;}
+  .specs .hide-s{display:none;}
+  .bar .brand b{display:none;}
+  .hint{display:none;}
+  .crop{display:none;}
+}
+@media (max-height:560px) and (orientation:landscape){
+  .deck,.hint{display:none;}
+  h1{font-size:clamp(2.2rem,7vw,3.4rem);}
+}
+@media (prefers-reduced-motion:reduce){
+  .rise{transition-duration:.01ms;}
+  .boot span{animation:none; opacity:.7;}
+}
+</style>
+</head>
+
+<body>
+<canvas id="gl" aria-label="Real-time ray-marched gyroid lattice"></canvas>
+
+<div class="crop tl"></div><div class="crop tr"></div><div class="crop bl"></div><div class="crop br"></div>
+
+<div class="boot" id="boot"><span>Compiling · distance field</span></div>
+
+<div class="nogl">
+  <div>
+    <p class="mono" style="color:var(--steel)">WebGL 2 unavailable</p>
+    <p style="max-width:34ch;margin:.8rem auto 0;color:#B9BDC4">This piece is ray-marched on the GPU and needs WebGL 2. <a href="../" style="border-bottom:1px solid var(--line)">Back to the other work</a>.</p>
+  </div>
+</div>
+
+<main class="ui">
+  <header class="bar">
+    <a class="mono brand rise d1" href="../">Artur Smirnov <b>· real-time 3D</b></a>
+    <span class="mono idx rise d1">Lattice — SDF study 01</span>
+  </header>
+
+  <div class="mid">
+    <section class="lede">
+      <p class="mono eyebrow rise d2">Triply-periodic minimal surface</p>
+      <h1 class="rise d3">Graded<em>Gyroid</em></h1>
+      <p class="deck rise d4">A metal lattice sphere-traced from a signed distance field — <b>no mesh, no textures, no model file</b>. <span class="hide-s">The cell grades finer toward the core, the section cut is live, and</span> every pixel of steel, dispersion and heat is hand-written GLSL.</p>
+      <a class="cta rise d5" href="https://t.me/smirnovarturr" target="_blank" rel="noopener">Available for WebGL work <i>&rarr;</i></a>
+    </section>
+    <div id="stage" aria-hidden="true"></div>
+  </div>
+
+  <div class="foot">
+    <dl class="specs mono rise d6" id="specs">
+      <dt>fps</dt><dd id="s-fps">—</dd>
+      <dt>draw</dt><dd id="s-draw">—</dd>
+      <dt class="hide-s">passes</dt><dd class="hide-s" id="s-pass">—</dd>
+      <dt>res</dt><dd id="s-res">—</dd>
+      <dt class="hide-s">steps</dt><dd class="hide-s" id="s-steps">—</dd>
+      <dt>geometry</dt><dd><u>0 B</u></dd>
+    </dl>
+
+    <p class="hint mono rise d6"><span>Drag · orbit</span><span>Scroll · dolly</span></p>
+
+    <div class="panel rise d6">
+      <div class="ctl">
+        <label for="c-cell">Cell</label><output id="o-cell">19.5</output>
+        <input id="c-cell" type="range" min="8" max="26" step="0.1" value="19.5" aria-label="Lattice cell frequency">
+      </div>
+      <div class="ctl">
+        <label for="c-wall">Wall</label><output id="o-wall">0.30</output>
+        <input id="c-wall" type="range" min="0.14" max="0.80" step="0.01" value="0.30" aria-label="Lattice wall thickness">
+      </div>
+      <div class="ctl">
+        <label for="c-sect">Section</label><output id="o-sect">51°</output>
+        <input id="c-sect" type="range" min="0" max="1" step="0.005" value="0.78" aria-label="Section cut angle">
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+/* =====================================================================
+   Graded Gyroid — raw WebGL2, no library.
+   Scene pass: sphere-traced TPMS lattice, analytic environment, custom
+   GGX-ish metal with per-channel dispersion, SDF soft shadow + AO,
+   volumetric core emission. Post: bright-pass -> two-level separable
+   Gaussian -> composite (ACES, chromatic aberration, vignette, grain).
+   ===================================================================== */
+(function () {
+  'use strict';
+
+  const cv = document.getElementById('gl');
+  const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* --- context, with the low-end probe: ask for a hardware-only context
+         first; a null answer means the browser would fall back to a
+         software rasteriser, so we retry and drop to the low tier. ----- */
+  const ATTRS = {
+    alpha: false, antialias: false, depth: false, stencil: false,
+    premultipliedAlpha: false, preserveDrawingBuffer: false,
+    powerPreference: 'high-performance', desynchronized: true
+  };
+  let softwareHint = false;
+  let gl = cv.getContext('webgl2', Object.assign({ failIfMajorPerformanceCaveat: true }, ATTRS));
+  if (!gl) { softwareHint = true; gl = cv.getContext('webgl2', ATTRS); }
+  if (!gl) { document.body.classList.add('nowebgl'); return; }
+
+  const hasFloatRT = !!gl.getExtension('EXT_color_buffer_float');
+  const isTouch = matchMedia('(hover: none) and (pointer: coarse)').matches;
+  const smallScreen = Math.min(innerWidth, innerHeight) < 700;
+
+  /* wide-gamut output where the display can show it — Lusion / 21hrs do
+     the same; the composite converts linear sRGB -> linear Display-P3. */
+  let p3 = false;
+  try {
+    if ('drawingBufferColorSpace' in gl && matchMedia('(color-gamut: p3)').matches) {
+      gl.drawingBufferColorSpace = 'display-p3';
+      p3 = gl.drawingBufferColorSpace === 'display-p3';
+    }
+  } catch (e) { p3 = false; }
+
+  /* ------------------------------------------------------------------ */
+  /*  quality tiers                                                      */
+  /* ------------------------------------------------------------------ */
+  const TIERS = [
+    { name: 'low',  steps: 56, shadow: 0,  vol: 10, bloom: 1, css: 0.70, cap: 1.25 },
+    { name: 'mid',  steps: 80, shadow: 12, vol: 14, bloom: 2, css: 0.92, cap: 1.5  },
+    { name: 'high', steps: 88, shadow: 14, vol: 18, bloom: 2, css: 0.98, cap: 1.5  }
+  ];
+  let tier = softwareHint ? 0 : (isTouch || smallScreen ? 1 : 2);
+  if (isTouch && smallScreen) tier = Math.min(tier, 1);
+
+  /* ------------------------------------------------------------------ */
+  /*  shaders                                                            */
+  /* ------------------------------------------------------------------ */
+  const VS = `#version 300 es
+void main(){
+  vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2) * 2.0 - 1.0;
+  gl_Position = vec4(p, 0.0, 1.0);
+}`;
+
+  const SCENE_FS = `#version 300 es
+precision highp float;
+out vec4 fragColor;
+
+uniform vec2  uRes;
+uniform vec2  uOff;
+uniform float uTime;
+uniform float uFocal;
+uniform vec3  uCam;
+uniform mat3  uBasis;
+uniform float uCell;      //js {min:8.0, max:26.0}
+uniform float uWall;      //js {min:0.14, max:0.80}
+uniform vec3  uWedgeA;
+uniform vec3  uWedgeB;
+uniform float uWedgeOn;
+uniform float uHeat;      //js {value:1.0}
+uniform float uGrow;
+
+#define R_OUT 1.0
+#define R_IN  0.30
+#define BIG   1e6
+
+const vec3 KEY_D = normalize(vec3(-0.42,  0.74,  0.52));
+const vec3 RIM_D = normalize(vec3( 0.76, -0.10, -0.64));
+const vec3 KEY_C = vec3(1.00, 0.955, 0.90);
+const vec3 RIM_C = vec3(0.42, 0.56, 0.85);
+const vec3 HOT_C = vec3(1.00, 0.40, 0.11);
+const vec3 STEEL = vec3(0.552, 0.586, 0.630);
+const vec3 TEMP1 = vec3(0.640, 0.470, 0.190);   // straw temper
+const vec3 TEMP2 = vec3(0.355, 0.385, 0.560);   // blue temper
+
+/* ---- hashes -------------------------------------------------------- */
+float h21(vec2 p){
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+float h31(vec3 p){
+  p = fract(p * 0.1031);
+  p += dot(p, p.yzx + 33.33);
+  return fract((p.x + p.y) * p.z);
+}
+/* cheap plasma turbulence — three folded sines beat a value-noise
+   lattice here because the volume only needs low-frequency motion */
+float turb(vec3 p, float t){
+  float a = sin(p.x * 2.9 + sin(p.y * 2.3 + t) + t * 0.7);
+  float b = sin(p.y * 3.3 + sin(p.z * 2.1 - t * 0.8));
+  float c = sin(p.z * 2.7 + sin(p.x * 3.1 + t * 0.5));
+  return 0.5 + 0.166 * (a + b + c);
+}
+
+/* ---- the field ------------------------------------------------------ */
+/* cell frequency grades: dense near the core, open at the skin */
+float cellAt(float r){
+  return uCell * mix(1.38, 0.84, smoothstep(R_IN, R_OUT, r));
+}
+
+/* returns .x distance, .y = 1 when the section plane owns the surface */
+vec2 map(vec3 p){
+  float r = length(p);
+  float k = cellAt(r);
+  vec3  q = p * k + uTime * 0.035;
+  float g = dot(sin(q), cos(q.yzx));                 // gyroid
+  float w = uWall * mix(1.34, 0.78, smoothstep(R_IN, R_OUT, r)) * uGrow;
+  float d = (abs(g) - w) / (k * 1.7);                // Lipschitz-corrected
+
+  d = max(d, r - R_OUT);                             // outer skin
+  d = max(d, R_IN - r);                              // inner cavity
+
+  float wg = min(dot(p, uWedgeA), dot(p, uWedgeB)) - (1.0 - uWedgeOn) * 50.0;
+  return vec2(max(d, wg), step(d, wg));
+}
+
+vec3 normalAt(vec3 p){
+  const vec2 e = vec2(1.0, -1.0) * 0.0016;
+  return normalize(
+      e.xyy * map(p + e.xyy).x + e.yyx * map(p + e.yyx).x +
+      e.yxy * map(p + e.yxy).x + e.xxx * map(p + e.xxx).x);
+}
+
+/* ray vs the bounding sphere: everything outside is free */
+vec2 bounds(vec3 ro, vec3 rd){
+  float b = dot(ro, rd);
+  float c = dot(ro, ro) - R_OUT * R_OUT;
+  float h = b * b - c;
+  if (h < 0.0) return vec2(BIG, -BIG);
+  h = sqrt(h);
+  return vec2(-b - h, -b + h);
+}
+
+float ao(vec3 p, vec3 n){
+  float o = 0.0, s = 1.0;
+  for (int i = 0; i < 5; i++){
+    float hgt = 0.008 + 0.042 * float(i);
+    o += (hgt - map(p + n * hgt).x) * s;
+    s *= 0.74;
+  }
+  return clamp(1.0 - 1.7 * o, 0.0, 1.0);
+}
+
+#if SHADOW_STEPS > 0
+float shadow(vec3 ro, vec3 rd, float ndl){
+  if (ndl <= 0.0) return 0.0;
+  float res = 1.0, t = 0.018;
+  for (int i = 0; i < SHADOW_STEPS; i++){
+    float h = map(ro + rd * t).x;
+    res = min(res, 9.0 * h / t);
+    t += clamp(h, 0.012, 0.13);
+    if (res < 0.02 || t > 2.3) break;
+  }
+  return clamp(res, 0.0, 1.0);
+}
+#endif
+
+/* ---- analytic environment ------------------------------------------
+   No HDR file. Two studio sources built out of cosine lobes: a large warm
+   softbox and a cool rim, each with a broad body plus a tight core, so
+   roughness widens the lobe instead of blurring a texture. */
+vec3 envmap(vec3 d, float rough){
+  float up = clamp(d.y * 0.5 + 0.5, 0.0, 1.0);
+  vec3 c = mix(vec3(0.0060, 0.0078, 0.0125), vec3(0.038, 0.047, 0.066), up * up);
+
+  float kd = max(dot(d, KEY_D), 0.0);
+  c += KEY_C * pow(kd, 1.7) * 0.62;                                  // softbox body
+  c += KEY_C * pow(kd, mix(110.0, 11.0, rough)) * mix(3.4, 0.70, rough);
+
+  float rd = max(dot(d, RIM_D), 0.0);
+  c += RIM_C * pow(rd, 2.4) * 0.055;
+  c += RIM_C * pow(rd, mix(60.0, 8.0, rough)) * mix(0.88, 0.20, rough);
+
+  c += vec3(0.20, 0.16, 0.13) * (1.0 - smoothstep(-0.9, -0.02, d.y)) * 0.10;
+  return c;
+}
+
+vec3 rotAxis(vec3 v, vec3 k, float a){
+  float c = cos(a), s = sin(a);
+  return v * c + cross(k, v) * s + k * dot(k, v) * (1.0 - c);
+}
+
+vec3 shade(vec3 p, vec3 rd, vec3 n, float cut, float r){
+  float ndv = clamp(dot(n, -rd), 0.0, 1.0);
+
+  /* depth grades the alloy: heat tempering colours toward the core */
+  float heat = 1.0 - smoothstep(R_IN, 0.92, r);
+  float micro = sin(p.x * 26.0) * sin(p.y * 26.0) * sin(p.z * 26.0);
+  float rough = 0.335 + 0.045 * micro;
+  vec3  F0 = STEEL;
+  F0 = mix(F0, TEMP1, smoothstep(0.12, 0.52, heat));
+  F0 = mix(F0, TEMP2, smoothstep(0.50, 0.86, heat));
+
+  /* the section face reads as freshly machined: turning marks, tighter
+     roughness, whiter base */
+  float turnMarks = fract(r * 78.0);
+  rough = mix(rough, 0.46 + 0.10 * turnMarks, cut);        // matte, tool-marked
+  F0    = mix(F0, mix(F0, vec3(0.80, 0.815, 0.835), 0.80), cut);
+  rough = clamp(rough, 0.04, 0.92);
+
+  vec3 R = reflect(rd, n);
+  float fres = pow(1.0 - ndv, 5.0);
+  vec3 F = F0 + (max(vec3(1.0 - rough), F0) - F0) * fres;
+
+  /* chromatic dispersion: the reflected ray is fanned around the view
+     tangent, wider at grazing angles */
+  vec3 tg = normalize(cross(n, rd) + 1e-6);
+  float sp = 0.0009 + 0.0032 * fres;
+  vec3 spec = vec3(
+    envmap(rotAxis(R, tg,  sp), rough).r,
+    envmap(R, rough).g,
+    envmap(rotAxis(R, tg, -sp), rough).b);
+
+  float occ = ao(p, n);
+#if SHADOW_STEPS > 0
+  float sh = shadow(p + n * 0.006, KEY_D, dot(n, KEY_D));
+#else
+  float sh = mix(0.55, 1.0, clamp(dot(n, KEY_D) * 0.5 + 0.5, 0.0, 1.0));
+#endif
+
+  vec3 col = F * spec * mix(0.20, 1.0, occ) * mix(0.40, 1.0, sh);
+  col += F0 * envmap(n, 1.0) * 0.50 * occ;            // rough ambient fill
+
+  /* glowing metal in the hot zone */
+  col += HOT_C * pow(heat, 4.2) * uHeat * 0.55 * mix(0.45, 1.0, occ);
+  return col;
+}
+
+/* volumetric core: emission accumulated in front of the first hit, so it
+   only leaks through the open cells and the section cut */
+vec3 core(vec3 ro, vec3 rd, float t0, float t1){
+  float tc = clamp(-dot(ro, rd), t0, t1);
+  if (length(ro + rd * tc) > 0.74) return vec3(0.0);
+  float dt = (t1 - t0) / float(VOL_STEPS);
+  float t  = t0 + dt * h21(gl_FragCoord.xy);
+  vec3 acc = vec3(0.0);
+  for (int i = 0; i < VOL_STEPS; i++){
+    vec3 p = ro + rd * t;
+    float r = length(p);
+    float dens = exp(-6.4 * r) * (0.55 + 0.75 * turb(p * 2.6, uTime * 0.55));
+    acc += mix(HOT_C, vec3(1.0, 0.84, 0.60), exp(-5.5 * r)) * dens;
+    t += dt;
+  }
+  return acc * dt * uHeat * 1.45;
+}
+
+/* the room itself stays almost black — no light lobes leak into it, the
+   only structure is a cool pool with a warm bloom behind the specimen */
+vec3 backdrop(vec3 rd, vec2 uv){
+  float up = clamp(rd.y * 0.5 + 0.5, 0.0, 1.0);
+  vec3 c = mix(vec3(0.0040, 0.0050, 0.0076), vec3(0.0105, 0.0132, 0.0190), up);
+  float q = dot(uv, uv);
+  c += vec3(0.040, 0.048, 0.068) * exp(-1.9 * q);          // cool pool behind it
+  c += vec3(0.052, 0.026, 0.010) * exp(-4.4 * q);          // warm spill from the core
+  c *= 1.0 - 0.45 * smoothstep(0.1, 1.4, -uv.y);           // floor falls away
+  return c;
+}
+
+void main(){
+  vec2 s  = vec2(min(uRes.x, uRes.y));
+  vec2 uv = (gl_FragCoord.xy * 2.0 - uRes) / s - uOff;
+
+  vec3 ro = uCam;
+  vec3 rd = normalize(uBasis * vec3(uv, uFocal));
+
+  vec2 bd = bounds(ro, rd);
+  vec3 col;
+
+  if (bd.x > bd.y){
+    col = backdrop(rd, uv);
+  } else {
+    float t0 = max(bd.x, 0.0), t1 = bd.y;
+    float t = t0, best = 1e9, bestT = t0, bestCut = 0.0;
+    bool hit = false;
+    for (int i = 0; i < MAX_STEPS; i++){
+      vec2 m = map(ro + rd * t);
+      if (m.x < best){ best = m.x; bestT = t; bestCut = m.y; }
+      if (m.x < 0.0013 * t + 0.0008){ hit = true; break; }
+      t += m.x * 0.84;
+      if (t > t1) break;
+    }
+    /* rays that graze the silhouette run out of steps before they land, which
+       used to punch speckle through the rim. Their closest approach is
+       reused as partial coverage, which both fills the holes and gives the
+       edge a free half-pixel of antialiasing. */
+    float cov = hit ? 1.0 : 1.0 - smoothstep(0.0022, 0.0090, best);
+    float th  = hit ? t : bestT;
+    vec3 bg = backdrop(rd, uv);
+
+    if (cov > 0.003){
+      vec3 p = ro + rd * th;
+      col = mix(bg, shade(p, rd, normalAt(p), bestCut, length(p)), cov);
+      col += core(ro, rd, t0, mix(t1, th, cov));
+    } else {
+      col = bg + core(ro, rd, t0, t1);
+    }
+  }
+
+  fragColor = vec4(col, 1.0);
+}`;
+
+  const BRIGHT_FS = `#version 300 es
+precision highp float;
+out vec4 fragColor;
+uniform sampler2D uSrc;
+uniform vec2  uTexel;
+uniform float uThresh;
+uniform float uKnee;
+void main(){
+  vec2 uv = gl_FragCoord.xy * uTexel;
+  vec3 c = texture(uSrc, uv + vec2(-0.5,-0.5) * uTexel).rgb
+         + texture(uSrc, uv + vec2( 0.5,-0.5) * uTexel).rgb
+         + texture(uSrc, uv + vec2(-0.5, 0.5) * uTexel).rgb
+         + texture(uSrc, uv + vec2( 0.5, 0.5) * uTexel).rgb;
+  c *= 0.25;
+  float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
+  float soft = clamp((l - uThresh + uKnee) / (2.0 * uKnee), 0.0, 1.0);
+  float w = max(l - uThresh, soft * soft * uKnee) / max(l, 1e-4);
+  fragColor = vec4(c * w, 1.0);
+}`;
+
+  const BLUR_FS = `#version 300 es
+precision highp float;
+out vec4 fragColor;
+uniform sampler2D uSrc;
+uniform vec2 uTexel;   // 1 / destination size
+uniform vec2 uDir;     // in source texels
+void main(){
+  vec2 uv = gl_FragCoord.xy * uTexel;
+  /* 9-tap gaussian folded into 5 linear samples */
+  vec3 c = texture(uSrc, uv).rgb * 0.2270270270;
+  c += (texture(uSrc, uv + uDir * 1.3846153846).rgb +
+        texture(uSrc, uv - uDir * 1.3846153846).rgb) * 0.3162162162;
+  c += (texture(uSrc, uv + uDir * 3.2307692308).rgb +
+        texture(uSrc, uv - uDir * 3.2307692308).rgb) * 0.0702702703;
+  fragColor = vec4(c, 1.0);
+}`;
+
+  const COMP_FS = `#version 300 es
+precision highp float;
+out vec4 fragColor;
+uniform sampler2D uScene;
+uniform sampler2D uBloom0;
+uniform sampler2D uBloom1;
+uniform vec2  uRes;
+uniform vec2  uSceneTexel;
+uniform float uTime;
+uniform float uExpo;
+uniform float uBloom;
+uniform float uCA;
+uniform float uGrain;
+uniform float uSharp;
+uniform float uVig;
+uniform float uFade;
+
+/* ACES fitted (Stephen Hill) */
+const mat3 ACES_IN = mat3(
+  0.59719, 0.07600, 0.02840,
+  0.35458, 0.90834, 0.13383,
+  0.04823, 0.01566, 0.83777);
+const mat3 ACES_OUT = mat3(
+   1.60475, -0.10208, -0.00327,
+  -0.53108,  1.10813, -0.07276,
+  -0.07367, -0.00605,  1.07602);
+vec3 aces(vec3 c){
+  c = ACES_IN * c;
+  vec3 a = c * (c + 0.0245786) - 0.000090537;
+  vec3 b = c * (0.983729 * c + 0.4329510) + 0.238081;
+  return clamp(ACES_OUT * (a / b), 0.0, 1.0);
+}
+
+#ifdef P3
+const mat3 TO_P3 = mat3(
+  0.8224621, 0.0331941, 0.0170827,
+  0.1775380, 0.9668058, 0.0723974,
+  0.0000000, 0.0000000, 0.9105199);
+#endif
+
+vec3 srgb(vec3 c){
+  return mix(c * 12.92, 1.055 * pow(max(c, 1e-5), vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c));
+}
+float h21(vec2 p){
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+
+void main(){
+  vec2 uv = gl_FragCoord.xy / uRes;
+  vec2 d  = uv - 0.5;
+  float r2 = dot(d, d);
+
+  /* chromatic aberration — lens-shaped, so it only bites at the edges */
+  vec2 off = d * uCA * r2;
+  vec3 col = vec3(
+    texture(uScene, uv + off).r,
+    texture(uScene, uv).g,
+    texture(uScene, uv - off).b);
+
+  /* the scene buffer is rendered below canvas resolution; a light
+     unsharp mask puts the machined edges back */
+  vec3 lo = (texture(uScene, uv + vec2(uSceneTexel.x, 0.0)).rgb +
+             texture(uScene, uv - vec2(uSceneTexel.x, 0.0)).rgb +
+             texture(uScene, uv + vec2(0.0, uSceneTexel.y)).rgb +
+             texture(uScene, uv - vec2(0.0, uSceneTexel.y)).rgb) * 0.25;
+  col += (col - lo) * uSharp;
+
+  col += texture(uBloom0, uv).rgb * uBloom;
+  col += texture(uBloom1, uv).rgb * uBloom * 0.85;
+
+  col = aces(col * uExpo);
+
+  col *= 1.0 - smoothstep(0.30, 1.12, length(d * vec2(1.05, 1.0)) * uVig);
+  col *= uFade;
+
+  float g = h21(gl_FragCoord.xy + fract(uTime) * 137.0) - 0.5;
+  col += g * uGrain * (0.30 + 0.70 * (1.0 - dot(col, vec3(0.333))));
+
+#ifdef P3
+  col = TO_P3 * max(col, 0.0);
+#endif
+  col = srgb(clamp(col, 0.0, 1.0));
+  col += (h21(gl_FragCoord.yx * 1.7) - 0.5) / 255.0;   // dither the ramps
+  fragColor = vec4(col, 1.0);
+}`;
+
+  /* ------------------------------------------------------------------ */
+  /*  gl plumbing                                                        */
+  /* ------------------------------------------------------------------ */
+  function compile(type, src) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+      console.error(gl.getShaderInfoLog(sh), src.split('\n').map((l, i) => (i + 1) + ' ' + l).join('\n'));
+      throw new Error('shader');
+    }
+    return sh;
+  }
+  function program(fsSrc, defs) {
+    let src = fsSrc;
+    if (defs) src = src.replace('\n', '\n' + defs + '\n');
+    const p = gl.createProgram();
+    gl.attachShader(p, compile(gl.VERTEX_SHADER, VS));
+    gl.attachShader(p, compile(gl.FRAGMENT_SHADER, src));
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+      console.error(gl.getProgramInfoLog(p));
+      throw new Error('link');
+    }
+    const u = {};
+    const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < n; i++) {
+      const info = gl.getActiveUniform(p, i);
+      u[info.name] = gl.getUniformLocation(p, info.name);
+    }
+    return { p, u };
+  }
+
+  function makeTarget() {
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    const fb = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+    return { tex, fb, w: 0, h: 0 };
+  }
+  function sizeTarget(t, w, h) {
+    w = Math.max(1, w | 0); h = Math.max(1, h | 0);
+    if (t.w === w && t.h === h) return;
+    t.w = w; t.h = h;
+    gl.bindTexture(gl.TEXTURE_2D, t.tex);
+    if (hasFloatRT) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
+    else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  }
+
+  const targets = { scene: makeTarget(), a: makeTarget(), b: makeTarget(), c: makeTarget(), d: makeTarget() };
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+  gl.disable(gl.DEPTH_TEST);
+  gl.disable(gl.BLEND);
+  gl.disable(gl.CULL_FACE);
+
+  let progScene, progBright, progBlur, progComp;
+  function buildScene() {
+    const t = TIERS[tier];
+    progScene = program(SCENE_FS,
+      '#define MAX_STEPS ' + t.steps + '\n#define SHADOW_STEPS ' + t.shadow + '\n#define VOL_STEPS ' + t.vol);
+  }
+  buildScene();
+  progBright = program(BRIGHT_FS);
+  progBlur = program(BLUR_FS);
+  progComp = program(COMP_FS, p3 ? '#define P3' : '');
+
+  let drawCount = 0;
+  function blit(pr, target, w, h) {
+    gl.useProgram(pr.p);
+    if (target) { gl.bindFramebuffer(gl.FRAMEBUFFER, target.fb); gl.viewport(0, 0, target.w, target.h); }
+    else { gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, w, h); }
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    drawCount++;
+  }
+  function bindTex(pr, name, unit, tex) {
+    gl.activeTexture(gl.TEXTURE0 + unit);
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.uniform1i(pr.u[name], unit);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /*  state + springs                                                    */
+  /* ------------------------------------------------------------------ */
+  const S = {
+    yaw: -1.24, pitch: 0.30, zoom: 1.0,
+    tYaw: -1.24, tPitch: 0.30, tZoom: 1.0,
+    vYaw: 0, vPitch: 0, vZoom: 0,
+    px: 0, py: 0, tpx: 0, tpy: 0, vpx: 0, vpy: 0,      // hover parallax
+    cell: 19.5, wall: 0.30, sect: 0.78,
+    tCell: 19.5, tWall: 0.30, tSect: 0.78,
+    vCell: 0, vWall: 0, vSect: 0,
+    grow: 0, dist: 4.7, tDist: 4.7,
+    dragging: false
+  };
+  let introCut = 0;
+  const WEDGE_LEAD = 0.60;   // leading cut face, square to the opening camera
+
+  function spring(cur, vel, target, stiff, damp, dt) {
+    vel += (-stiff * (cur - target) - damp * vel) * dt;
+    return [cur + vel * dt, vel];
+  }
+
+  /* ------------------------------------------------------------------ */
+  /*  layout: the camera frames whatever space the copy leaves it        */
+  /* ------------------------------------------------------------------ */
+  const stageEl = document.getElementById('stage');
+  const layout = { offX: 0, offY: 0, baseDist: 4.7 };
+  const FOCAL = 2.9;
+
+  function measure() {
+    const r = stageEl.getBoundingClientRect();
+    const vw = innerWidth, vh = innerHeight;
+    const s = Math.min(vw, vh);
+    if (r.width < 40 || r.height < 40) {
+      layout.offX = 0; layout.offY = 0; layout.baseDist = 5.0; return;
+    }
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    layout.offX = (cx - vw / 2) * 2 / s;
+    layout.offY = -(cy - vh / 2) * 2 / s;
+    const radiusPx = 0.445 * Math.min(r.width, r.height);
+    const uvR = Math.max(0.18, 2 * radiusPx / s);
+    layout.baseDist = Math.sqrt(Math.pow(FOCAL / uvR, 2) + 1);
+    layout.baseDist = Math.min(Math.max(layout.baseDist, 2.9), 9.0);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /*  input                                                              */
+  /* ------------------------------------------------------------------ */
+  let lastX = 0, lastY = 0, pinch = 0;
+  const active = new Map();
+
+  cv.addEventListener('pointerdown', e => {
+    active.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (active.size === 1) { S.dragging = true; lastX = e.clientX; lastY = e.clientY; cv.classList.add('dragging'); }
+    if (active.size === 2) pinch = pinchDist();
+    cv.setPointerCapture(e.pointerId);
+  });
+  function pinchDist() {
+    const v = [...active.values()];
+    return Math.hypot(v[0].x - v[1].x, v[0].y - v[1].y);
+  }
+  cv.addEventListener('pointermove', e => {
+    if (active.has(e.pointerId)) active.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const s = Math.min(innerWidth, innerHeight);
+    if (S.dragging && active.size === 1) {
+      S.tYaw -= (e.clientX - lastX) / s * 3.1;
+      S.tPitch = Math.max(-1.32, Math.min(1.32, S.tPitch + (e.clientY - lastY) / s * 3.1));
+      lastX = e.clientX; lastY = e.clientY;
+    } else if (active.size === 2) {
+      const p = pinchDist();
+      if (pinch > 0) S.tZoom = clampZoom(S.tZoom * Math.pow(pinch / p, 0.9));
+      pinch = p;
+    } else if (!isTouch) {
+      S.tpx = (e.clientX / innerWidth - 0.5) * 2;
+      S.tpy = (e.clientY / innerHeight - 0.5) * 2;
+    }
+  });
+  function endPointer(e) {
+    active.delete(e.pointerId);
+    if (active.size === 0) { S.dragging = false; cv.classList.remove('dragging'); }
+    if (active.size < 2) pinch = 0;
+  }
+  cv.addEventListener('pointerup', endPointer);
+  cv.addEventListener('pointercancel', endPointer);
+  cv.addEventListener('pointerleave', e => { if (!isTouch) { S.tpx = 0; S.tpy = 0; } });
+  function clampZoom(z) { return Math.min(Math.max(z, 0.62), 1.9); }
+  addEventListener('wheel', e => {
+    e.preventDefault();
+    S.tZoom = clampZoom(S.tZoom * Math.exp(e.deltaY * 0.0011));
+  }, { passive: false });
+
+  /* sliders */
+  function hook(id, out, key, fmt) {
+    const el = document.getElementById(id), o = document.getElementById(out);
+    const set = () => { S[key] = parseFloat(el.value); o.textContent = fmt(S[key]); };
+    el.addEventListener('input', set);
+    set();
+  }
+  hook('c-cell', 'o-cell', 'tCell', v => v.toFixed(1));
+  hook('c-wall', 'o-wall', 'tWall', v => v.toFixed(2));
+  hook('c-sect', 'o-sect', 'tSect', v => Math.round(v * 66) + '°');
+
+  /* ------------------------------------------------------------------ */
+  /*  adaptive resolution                                                */
+  /* ------------------------------------------------------------------ */
+  let scale = 0.7, baseScale = 0.7;
+  /* vsync makes the raw frame interval bottom out at the refresh period, so
+     the budget is measured against an estimate of that period rather than
+     against a fixed 16.7 ms — otherwise the scaler can only ever ratchet down */
+  let ema = 16.7, adaptClock = 0, tierDrops = 0, frameMin = 1e9, refresh = 16.7;
+  let cw = 0, ch = 0, dpr = 1;
+
+  function resize() {
+    const t = TIERS[tier];
+    dpr = Math.min(devicePixelRatio || 1, t.cap);
+    const nb = Math.min(1.0, t.css / dpr);
+    if (Math.abs(nb - baseScale) > 1e-4) { scale = Math.min(scale, nb) || nb; baseScale = nb; }
+    if (scale > baseScale || scale < baseScale * 0.5) scale = baseScale;
+    const w = Math.round(innerWidth * dpr), h = Math.round(innerHeight * dpr);
+    if (w !== cw || h !== ch) {
+      cw = w; ch = h;
+      cv.width = w; cv.height = h;
+    }
+    sizeTarget(targets.scene, w * scale, h * scale);
+    sizeTarget(targets.a, w / 2, h / 2);
+    sizeTarget(targets.b, w / 2, h / 2);
+    sizeTarget(targets.c, w / 4, h / 4);
+    sizeTarget(targets.d, w / 4, h / 4);
+    measure();
+  }
+  addEventListener('resize', () => { resize(); }, { passive: true });
+  if (window.ResizeObserver) new ResizeObserver(() => measure()).observe(stageEl);
+
+  /* ------------------------------------------------------------------ */
+  /*  readouts                                                           */
+  /* ------------------------------------------------------------------ */
+  const el = {
+    fps: document.getElementById('s-fps'), draw: document.getElementById('s-draw'),
+    pass: document.getElementById('s-pass'), res: document.getElementById('s-res'),
+    steps: document.getElementById('s-steps')
+  };
+  let hudClock = 0, lastDraw = 0;
+
+  /* ------------------------------------------------------------------ */
+  /*  frame                                                              */
+  /* ------------------------------------------------------------------ */
+  let t0 = performance.now(), started = 0, frames = 0;
+  resize();
+
+  function frame(now) {
+    const raw = (now - t0) / 1000;
+    t0 = now;
+    const dt = Math.min(raw, 0.05);
+    if (!started) started = now;
+    const T = (now - started) / 1000;
+
+    /* frame-time EMA drives both the resolution scale and, once, the tier */
+    ema += ((raw * 1000) - ema) * 0.08;
+    adaptClock += dt;
+    if (raw > 0.003) frameMin = Math.min(frameMin, raw * 1000);
+    if (adaptClock > 0.6 && frames > 30) {
+      adaptClock = 0;
+      refresh = Math.max(7.5, Math.min(17.2, frameMin));
+      frameMin = 1e9;
+      if (ema > refresh * 2.2 && tier > 0 && tierDrops < 1 && frames > 420 && scale <= baseScale * 0.55) {
+        tierDrops++; tier--; buildScene(); resize();
+      } else if (ema > refresh * 1.35 && scale > baseScale * 0.5) {
+        scale = Math.max(baseScale * 0.5, scale - 0.07); resize();
+      } else if (ema < refresh * 1.10 && scale < baseScale) {
+        scale = Math.min(baseScale, scale + 0.05); resize();
+      }
+    }
+
+    /* springs */
+    if (!REDUCED && !S.dragging) S.tYaw += dt * 0.055;
+    let r;
+    r = spring(S.yaw, S.vYaw, S.tYaw, 90, 15, dt); S.yaw = r[0]; S.vYaw = r[1];
+    r = spring(S.pitch, S.vPitch, S.tPitch, 90, 15, dt); S.pitch = r[0]; S.vPitch = r[1];
+    r = spring(S.zoom, S.vZoom, S.tZoom, 70, 14, dt); S.zoom = r[0]; S.vZoom = r[1];
+    r = spring(S.px, S.vpx, S.tpx, 26, 9, dt); S.px = r[0]; S.vpx = r[1];
+    r = spring(S.py, S.vpy, S.tpy, 26, 9, dt); S.py = r[0]; S.vpy = r[1];
+    r = spring(S.cell, S.vCell, S.tCell, 120, 19, dt); S.cell = r[0]; S.vCell = r[1];
+    r = spring(S.wall, S.vWall, S.tWall, 120, 19, dt); S.wall = r[0]; S.vWall = r[1];
+    r = spring(S.sect, S.vSect, S.tSect, 110, 18, dt); S.sect = r[0]; S.vSect = r[1];
+
+    /* intro: the lattice thickens out of nothing while the camera settles */
+    const introT = REDUCED ? 1 : Math.min(1, T / 1.65);
+    const ease = 1 - Math.pow(1 - introT, 3);
+    S.grow = 0.10 + 0.90 * ease;
+    /* the cut opens on a second, slower beat — the piece reads as a solid
+       specimen first and a section drawing after */
+    const cutT = REDUCED ? 1 : Math.min(1, Math.max(0, (T - 0.85) / 1.5));
+    introCut = 1 - Math.pow(1 - cutT, 4);
+    const dist = layout.baseDist * (1 + (1 - ease) * 0.55) / S.zoom;
+
+    const yaw = S.yaw + S.px * 0.075;
+    const pitch = Math.max(-1.35, Math.min(1.35, S.pitch + S.py * 0.045));
+    const cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const camX = dist * cp * Math.sin(yaw), camY = dist * sp, camZ = dist * cp * Math.cos(yaw);
+    const fx = -camX / dist, fy = -camY / dist, fz = -camZ / dist;
+    let rx = fz * 1 - 0 * fy, ry = 0, rz = -fx;             // cross(fwd, up=(0,1,0))
+    const rl = Math.hypot(rx, ry, rz) || 1; rx /= rl; ry /= rl; rz /= rl;
+    const ux = ry * fz - rz * fy, uy = rz * fx - rx * fz, uz = rx * fy - ry * fx;
+
+    const half = S.sect * introCut * 1.15;
+    const lo = WEDGE_LEAD, hi = WEDGE_LEAD + 2 * half;
+    const a = [-Math.sin(lo), 0, Math.cos(lo)];
+    const b = [Math.sin(hi), 0, -Math.cos(hi)];
+
+    /* ---- scene pass ---- */
+    drawCount = 0;
+    const P = progScene;
+    gl.useProgram(P.p);
+    gl.uniform2f(P.u.uRes, targets.scene.w, targets.scene.h);
+    gl.uniform2f(P.u.uOff, layout.offX, layout.offY);
+    gl.uniform1f(P.u.uTime, T);
+    gl.uniform1f(P.u.uFocal, FOCAL);
+    gl.uniform3f(P.u.uCam, camX, camY, camZ);
+    gl.uniformMatrix3fv(P.u.uBasis, false, [rx, ry, rz, ux, uy, uz, fx, fy, fz]);
+    gl.uniform1f(P.u.uCell, S.cell);
+    gl.uniform1f(P.u.uWall, S.wall * (1 + 0.028 * Math.sin(T * 0.5)));
+    gl.uniform3f(P.u.uWedgeA, a[0], a[1], a[2]);
+    gl.uniform3f(P.u.uWedgeB, b[0], b[1], b[2]);
+    gl.uniform1f(P.u.uWedgeOn, Math.min(1, S.sect * introCut * 40));
+    gl.uniform1f(P.u.uHeat, (0.86 + 0.14 * Math.sin(T * 0.85) + 0.06 * Math.sin(T * 2.31)) * ease);
+    gl.uniform1f(P.u.uGrow, S.grow);
+    blit(P, targets.scene);
+
+    /* ---- bloom ---- */
+    const t = TIERS[tier];
+    gl.useProgram(progBright.p);
+    bindTex(progBright, 'uSrc', 0, targets.scene.tex);
+    gl.uniform2f(progBright.u.uTexel, 1 / targets.a.w, 1 / targets.a.h);
+    gl.uniform1f(progBright.u.uThresh, 1.05);
+    gl.uniform1f(progBright.u.uKnee, 0.55);
+    blit(progBright, targets.a);
+
+    function blur(src, dst, dx, dy) {
+      gl.useProgram(progBlur.p);
+      bindTex(progBlur, 'uSrc', 0, src.tex);
+      gl.uniform2f(progBlur.u.uTexel, 1 / dst.w, 1 / dst.h);
+      gl.uniform2f(progBlur.u.uDir, dx / src.w, dy / src.h);
+      blit(progBlur, dst);
+    }
+    blur(targets.a, targets.b, 1, 0);
+    blur(targets.b, targets.a, 0, 1);
+    if (t.bloom > 1) {
+      blur(targets.a, targets.c, 1, 0);
+      blur(targets.c, targets.d, 0, 1);
+    }
+
+    /* ---- composite ---- */
+    const C = progComp;
+    gl.useProgram(C.p);
+    bindTex(C, 'uScene', 0, targets.scene.tex);
+    bindTex(C, 'uBloom0', 1, targets.a.tex);
+    bindTex(C, 'uBloom1', 2, (t.bloom > 1 ? targets.d : targets.a).tex);
+    gl.uniform2f(C.u.uRes, cw, ch);
+    gl.uniform2f(C.u.uSceneTexel, 1 / targets.scene.w, 1 / targets.scene.h);
+    gl.uniform1f(C.u.uTime, T);
+    gl.uniform1f(C.u.uExpo, 1.0);
+    gl.uniform1f(C.u.uBloom, t.bloom > 1 ? 0.42 : 0.58);
+    gl.uniform1f(C.u.uCA, 0.0065);
+    gl.uniform1f(C.u.uGrain, 0.030);
+    gl.uniform1f(C.u.uSharp, 0.18);
+    gl.uniform1f(C.u.uVig, 1.28);
+    gl.uniform1f(C.u.uFade, REDUCED ? 1 : Math.min(1, T / 0.9));
+    blit(C, null, cw, ch);
+
+    lastDraw = drawCount;
+    frames++;
+
+    if (frames === 2) {
+      document.getElementById('boot').classList.add('gone');
+      document.body.classList.add('ready');
+    }
+
+    hudClock += dt;
+    if (hudClock > 0.35) {
+      hudClock = 0;
+      el.fps.textContent = String(Math.round(1000 / Math.max(ema, 0.5)));
+      el.draw.textContent = String(lastDraw);
+      el.pass.textContent = String(lastDraw);
+      el.res.textContent = (scale * dpr).toFixed(2) + '× css';
+      el.steps.textContent = String(TIERS[tier].steps);
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* pause when hidden — no reason to burn a phone battery in a tab */
+  document.addEventListener('visibilitychange', () => { t0 = performance.now(); });
+})();
+</script>
+</body>
+</html>
