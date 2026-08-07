@@ -39,7 +39,11 @@ export const TIERS = {
     rtScale: 0.4,
     dispersion: false,
     hqVeins: false,
-    fbmOctaves: 2,
+    // Still three octaves. This define is shared with the vertex stage, and
+    // dropping to two there changes the *shape* of the surface — the low tier
+    // would look like a different material rather than a cheaper render of the
+    // same one. The saving that matters is HQ_VEINS, which is fragment-side.
+    fbmOctaves: 3,
     dust: 0,
     antialias: false,
   },

@@ -216,7 +216,7 @@ void main() {
   // This one *does* follow the displaced outline, so it carries the crisp edge
   // and the halo only has to supply the bloom around it.
   float rim = pow(1.0 - NdotV, 6.0);
-  color += uRimColor * rim * (0.10 + uLevel * 0.48 + uVoice * 0.40);
+  color += uRimColor * rim * (0.08 + uLevel * 0.28 + uVoice * 0.26);
 
   // Entrance: the orb resolves out of a flat dark disc rather than popping in.
   color *= smoothstep(0.0, 0.75, uEnter);
