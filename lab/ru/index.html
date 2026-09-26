@@ -46,6 +46,39 @@
 
     <p id="fatal"></p>
 
+    <script>
+      // The #hud panel is rendered entirely by the shared (EN-only) bundle. Its dt labels are set
+      // once and never rewritten (fps/gpu frame update only their own dd text), so a one-time patch
+      // sticks; the few dd values that are English phrases rather than bare numbers get translated too.
+      (function () {
+        var LABELS = {
+          backend: 'бэкенд', adapter: 'адаптер', particles: 'частицы', simulation: 'симуляция',
+          state: 'состояние', dispatch: 'диспатч', 'draw calls': 'draw-вызовы', fps: 'кадр/с', 'gpu frame': 'кадр GPU'
+        };
+        var VALUES = {
+          'compute pass, storage buffers': 'compute-проход, storage-буферы'
+        };
+        function patch() {
+          var rows = document.querySelectorAll('#hud dl > .row');
+          if (!rows.length) return false;
+          rows.forEach(function (row) {
+            var dt = row.querySelector('dt'), dd = row.querySelector('dd');
+            if (dt && LABELS[dt.textContent]) dt.textContent = LABELS[dt.textContent];
+            if (dd) {
+              if (VALUES[dd.textContent]) dd.textContent = VALUES[dd.textContent];
+              else if (/ resident$/.test(dd.textContent)) dd.textContent = dd.textContent.replace(/ resident$/, ' выделено');
+              else if (/ lanes$/.test(dd.textContent)) dd.textContent = dd.textContent.replace(/ lanes$/, ' потока');
+            }
+          });
+          return true;
+        }
+        if (!patch()) {
+          var mo = new MutationObserver(function () { if (patch()) mo.disconnect(); });
+          mo.observe(document.getElementById('hud'), { childList: true, subtree: true });
+        }
+      })();
+    </script>
+
     <noscript>Эта страница рисуется на GPU и требует включённого JavaScript.</noscript>
   </body>
 </html>
