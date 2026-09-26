@@ -1,36 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="utf-8">
 <script src="/works/js/gad-loader.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#07080A">
-<title>Artur Smirnov — real-time 3D for the browser</title>
-<meta name="description" content="Freelance WebGL developer. Three.js and hand-written GLSL: 3D product configurators, interactive sites, and the engineering logic behind them. Five live demos.">
+<title>Артур Смирнов — 3D в реальном времени для браузера</title>
+<meta name="description" content="Фриланс-разработчик WebGL. Three.js и GLSL, написанный руками: 3D-конфигураторы товаров, интерактивные сайты и инженерная логика за ними. Пять живых демо.">
 
-<link rel="canonical" href="https://smirnov-artur.github.io/webgl/">
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="alternate icon" href="assets/icon-32.png" sizes="32x32">
-<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="canonical" href="https://smirnov-artur.github.io/webgl/ru/">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="../assets/icon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="../assets/icon-180.png">
 
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Artur Smirnov">
-<meta property="og:url" content="https://smirnov-artur.github.io/webgl/">
-<meta property="og:title" content="Artur Smirnov — real-time 3D for the browser">
-<meta property="og:description" content="Three.js and hand-written GLSL: 3D product configurators, interactive sites, and the engineering logic behind them. Five live demos.">
+<meta property="og:site_name" content="Артур Смирнов">
+<meta property="og:url" content="https://smirnov-artur.github.io/webgl/ru/">
+<meta property="og:title" content="Артур Смирнов — 3D в реальном времени для браузера">
+<meta property="og:description" content="Three.js и GLSL, написанный руками: 3D-конфигураторы товаров, интерактивные сайты и инженерная логика за ними. Пять живых демо.">
 <meta property="og:image" content="https://smirnov-artur.github.io/webgl/assets/og.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Real-time 3D for the browser — a live GLSL contour field behind the title">
+<meta property="og:image:alt" content="3D в реальном времени для браузера — живое GLSL-поле контуров за заголовком">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Artur Smirnov — real-time 3D for the browser">
-<meta name="twitter:description" content="Three.js and hand-written GLSL: 3D product configurators, interactive sites, and the engineering logic behind them.">
+<meta name="twitter:title" content="Артур Смирнов — 3D в реальном времени для браузера">
+<meta name="twitter:description" content="Three.js и GLSL, написанный руками: 3D-конфигураторы товаров, интерактивные сайты и инженерная логика за ними.">
 <meta name="twitter:image" content="https://smirnov-artur.github.io/webgl/assets/og.jpg">
 
-<link rel="preload" href="assets/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/plexmono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/plexmono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
 
 <style>
   /* self-hosted latin subsets — no third-party request in the critical path */
@@ -39,14 +39,14 @@
     font-style: normal;
     font-weight: 100 900;
     font-display: swap;
-    src: url("assets/fonts/archivo-var-latin.woff2") format("woff2");
+    src: url("../assets/fonts/archivo-var-latin.woff2") format("woff2");
   }
   @font-face {
     font-family: "IBM Plex Mono";
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url("assets/fonts/plexmono-400-latin.woff2") format("woff2");
+    src: url("../assets/fonts/plexmono-400-latin.woff2") format("woff2");
   }
 
   :root {
@@ -622,9 +622,6 @@
   }
 
   @media (max-width: 460px) {
-    /* В две колонки приборная строка уже не помещается: обе подписи рвались
-       посреди себя, и живой счётчик кадров оставался на второй строке в виде
-       одинокого «60». Кладём их одна под другой — каждая влезает в строку. */
     .hud { grid-template-columns: minmax(0, 1fr); }
     .hud > :nth-child(3) { text-align: left; }
   }
@@ -644,24 +641,24 @@
   <canvas id="gl" aria-hidden="true"></canvas>
 
   <div class="shell hero-top">
-    <p class="mark"><i aria-hidden="true"></i>Artur Smirnov<a class="gad-mark" href="https://smirnov-artur.github.io/works/en" aria-label="g.a.d."><svg class="gad-logo" viewBox="0 0 355 110" role="img" aria-label="g.a.d."><path fill="currentColor" d="M53.7 66.8V57.9L54.3 55.8V43.7L53.7 41.7V27.6H70.8V66Q70.8 75.8 66.4 82.6Q61.9 89.5 54 93.1Q46.1 96.7 35.6 96.7Q28.3 96.7 22.2 94.8Q16.1 92.9 10.1 89.1V76Q15.7 80.3 21.9 82.2Q28.1 84 34.5 84Q43.8 84 48.7 79.9Q53.7 75.7 53.7 66.8ZM30.5 74.8Q23.2 74.8 17.4 71.8Q11.6 68.8 8.3 63.3Q4.9 57.8 4.9 50.5Q4.9 43.1 8.3 37.6Q11.6 32.2 17.4 29.1Q23.2 26.1 30.5 26.1Q36 26.1 40.6 27.8Q45.2 29.5 48.8 32.3Q52.4 35 54.9 38.3Q57.4 41.5 58.7 44.8Q60 48.1 60 50.7Q60 54.1 57.9 58.2Q55.9 62.4 52.1 66.2Q48.3 70 42.8 72.4Q37.4 74.8 30.5 74.8ZM36.2 63Q41.9 63 46.4 59.9Q50.9 56.9 54.3 50.5Q50.9 43.9 46.4 40.9Q41.8 37.9 36.2 37.9Q31.9 37.9 28.7 39.4Q25.6 41 23.9 43.8Q22.1 46.6 22.1 50.5Q22.1 54.2 23.8 57Q25.5 59.9 28.6 61.4Q31.8 63 36.2 63Z M84.7 80.9Q81.9 80.9 79.6 79.6Q77.4 78.3 76.1 76Q74.8 73.8 74.8 71.1Q74.8 68.3 76.1 66.1Q77.4 63.9 79.6 62.6Q81.9 61.2 84.7 61.2Q87.4 61.2 89.6 62.6Q91.8 63.9 93.2 66.1Q94.5 68.3 94.5 71.1Q94.5 73.8 93.2 76Q91.8 78.3 89.6 79.6Q87.4 80.9 84.7 80.9Z M146.4 80 144.1 61 146.6 53.8 144.1 46.7 146.4 27.6H164.2L161 53.8L164.2 80ZM150.7 53.8Q149.3 62.2 145.4 68.4Q141.6 74.6 135.7 78Q129.8 81.5 122.4 81.5Q114.7 81.5 108.9 78Q103 74.5 99.7 68.3Q96.4 62.1 96.4 53.8Q96.4 45.5 99.7 39.3Q103 33.1 108.9 29.6Q114.7 26.1 122.4 26.1Q129.8 26.1 135.7 29.5Q141.6 33 145.5 39.2Q149.4 45.3 150.7 53.8ZM113.7 53.8Q113.7 58 115.4 61.3Q117.2 64.5 120.3 66.4Q123.3 68.3 127.4 68.3Q131.4 68.3 135.1 66.4Q138.7 64.5 141.5 61.3Q144.2 58 145.6 53.8Q144.2 49.5 141.5 46.3Q138.7 43 135.1 41.1Q131.4 39.2 127.4 39.2Q123.3 39.2 120.3 41.1Q117.2 43 115.4 46.3Q113.7 49.5 113.7 53.8Z M176.9 80.9Q174.2 80.9 171.9 79.6Q169.7 78.3 168.4 76Q167.1 73.8 167.1 71.1Q167.1 68.3 168.4 66.1Q169.7 63.9 171.9 62.6Q174.2 61.2 176.9 61.2Q179.7 61.2 181.9 62.6Q184.1 63.9 185.4 66.1Q186.8 68.3 186.8 71.1Q186.8 73.8 185.4 76Q184.1 78.3 181.9 79.6Q179.7 80.9 176.9 80.9Z M239 80 236.7 60.2 239.8 54 236.8 46.1 241 9.2H258.8L253.5 52.5L256.7 80ZM242.9 53.8Q241.6 62.2 237.7 68.4Q233.8 74.6 228 78Q222.1 81.5 214.7 81.5Q207 81.5 201.1 78Q195.3 74.5 192 68.3Q188.7 62.1 188.7 53.8Q188.7 45.5 192 39.3Q195.3 33.1 201.1 29.6Q207 26.1 214.7 26.1Q222.1 26.1 228 29.5Q233.8 33 237.8 39.2Q241.7 45.3 242.9 53.8ZM206 53.8Q206 58 207.7 61.3Q209.5 64.5 212.5 66.4Q215.6 68.3 219.7 68.3Q223.7 68.3 227.4 66.4Q231 64.5 233.7 61.3Q236.5 58 237.9 53.8Q236.5 49.5 233.7 46.3Q231 43 227.4 41.1Q223.7 39.2 219.7 39.2Q215.6 39.2 212.5 41.1Q209.5 43 207.7 46.3Q206 49.5 206 53.8Z M269.4 80.9Q266.6 80.9 264.4 79.6Q262.1 78.3 260.8 76Q259.6 73.8 259.6 71.1Q259.6 68.3 260.8 66.1Q262.1 63.9 264.4 62.6Q266.6 61.2 269.4 61.2Q272.2 61.2 274.4 62.6Q276.6 63.9 277.9 66.1Q279.2 68.3 279.2 71.1Q279.2 73.8 277.9 76Q276.6 78.3 274.4 79.6Q272.2 80.9 269.4 80.9Z"/><circle class="ring" cx="322" cy="30" r="22" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" transform="rotate(-90 322 30)" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/><circle class="orb" cx="322" cy="8" r="5" fill="currentColor"/></svg></a></p>
-    <p class="mono">Freelance · WebGL &amp; Three.js</p>
+    <p class="mark"><i aria-hidden="true"></i>Артур Смирнов<a class="gad-mark" href="https://smirnov-artur.github.io/works/" aria-label="g.a.d."><svg class="gad-logo" viewBox="0 0 355 110" role="img" aria-label="g.a.d."><path fill="currentColor" d="M53.7 66.8V57.9L54.3 55.8V43.7L53.7 41.7V27.6H70.8V66Q70.8 75.8 66.4 82.6Q61.9 89.5 54 93.1Q46.1 96.7 35.6 96.7Q28.3 96.7 22.2 94.8Q16.1 92.9 10.1 89.1V76Q15.7 80.3 21.9 82.2Q28.1 84 34.5 84Q43.8 84 48.7 79.9Q53.7 75.7 53.7 66.8ZM30.5 74.8Q23.2 74.8 17.4 71.8Q11.6 68.8 8.3 63.3Q4.9 57.8 4.9 50.5Q4.9 43.1 8.3 37.6Q11.6 32.2 17.4 29.1Q23.2 26.1 30.5 26.1Q36 26.1 40.6 27.8Q45.2 29.5 48.8 32.3Q52.4 35 54.9 38.3Q57.4 41.5 58.7 44.8Q60 48.1 60 50.7Q60 54.1 57.9 58.2Q55.9 62.4 52.1 66.2Q48.3 70 42.8 72.4Q37.4 74.8 30.5 74.8ZM36.2 63Q41.9 63 46.4 59.9Q50.9 56.9 54.3 50.5Q50.9 43.9 46.4 40.9Q41.8 37.9 36.2 37.9Q31.9 37.9 28.7 39.4Q25.6 41 23.9 43.8Q22.1 46.6 22.1 50.5Q22.1 54.2 23.8 57Q25.5 59.9 28.6 61.4Q31.8 63 36.2 63Z M84.7 80.9Q81.9 80.9 79.6 79.6Q77.4 78.3 76.1 76Q74.8 73.8 74.8 71.1Q74.8 68.3 76.1 66.1Q77.4 63.9 79.6 62.6Q81.9 61.2 84.7 61.2Q87.4 61.2 89.6 62.6Q91.8 63.9 93.2 66.1Q94.5 68.3 94.5 71.1Q94.5 73.8 93.2 76Q91.8 78.3 89.6 79.6Q87.4 80.9 84.7 80.9Z M146.4 80 144.1 61 146.6 53.8 144.1 46.7 146.4 27.6H164.2L161 53.8L164.2 80ZM150.7 53.8Q149.3 62.2 145.4 68.4Q141.6 74.6 135.7 78Q129.8 81.5 122.4 81.5Q114.7 81.5 108.9 78Q103 74.5 99.7 68.3Q96.4 62.1 96.4 53.8Q96.4 45.5 99.7 39.3Q103 33.1 108.9 29.6Q114.7 26.1 122.4 26.1Q129.8 26.1 135.7 29.5Q141.6 33 145.5 39.2Q149.4 45.3 150.7 53.8ZM113.7 53.8Q113.7 58 115.4 61.3Q117.2 64.5 120.3 66.4Q123.3 68.3 127.4 68.3Q131.4 68.3 135.1 66.4Q138.7 64.5 141.5 61.3Q144.2 58 145.6 53.8Q144.2 49.5 141.5 46.3Q138.7 43 135.1 41.1Q131.4 39.2 127.4 39.2Q123.3 39.2 120.3 41.1Q117.2 43 115.4 46.3Q113.7 49.5 113.7 53.8Z M176.9 80.9Q174.2 80.9 171.9 79.6Q169.7 78.3 168.4 76Q167.1 73.8 167.1 71.1Q167.1 68.3 168.4 66.1Q169.7 63.9 171.9 62.6Q174.2 61.2 176.9 61.2Q179.7 61.2 181.9 62.6Q184.1 63.9 185.4 66.1Q186.8 68.3 186.8 71.1Q186.8 73.8 185.4 76Q184.1 78.3 181.9 79.6Q179.7 80.9 176.9 80.9Z M239 80 236.7 60.2 239.8 54 236.8 46.1 241 9.2H258.8L253.5 52.5L256.7 80ZM242.9 53.8Q241.6 62.2 237.7 68.4Q233.8 74.6 228 78Q222.1 81.5 214.7 81.5Q207 81.5 201.1 78Q195.3 74.5 192 68.3Q188.7 62.1 188.7 53.8Q188.7 45.5 192 39.3Q195.3 33.1 201.1 29.6Q207 26.1 214.7 26.1Q222.1 26.1 228 29.5Q233.8 33 237.8 39.2Q241.7 45.3 242.9 53.8ZM206 53.8Q206 58 207.7 61.3Q209.5 64.5 212.5 66.4Q215.6 68.3 219.7 68.3Q223.7 68.3 227.4 66.4Q231 64.5 233.7 61.3Q236.5 58 237.9 53.8Q236.5 49.5 233.7 46.3Q231 43 227.4 41.1Q223.7 39.2 219.7 39.2Q215.6 39.2 212.5 41.1Q209.5 43 207.7 46.3Q206 49.5 206 53.8Z M269.4 80.9Q266.6 80.9 264.4 79.6Q262.1 78.3 260.8 76Q259.6 73.8 259.6 71.1Q259.6 68.3 260.8 66.1Q262.1 63.9 264.4 62.6Q266.6 61.2 269.4 61.2Q272.2 61.2 274.4 62.6Q276.6 63.9 277.9 66.1Q279.2 68.3 279.2 71.1Q279.2 73.8 277.9 76Q276.6 78.3 274.4 79.6Q272.2 80.9 269.4 80.9Z"/><circle class="ring" cx="322" cy="30" r="22" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" transform="rotate(-90 322 30)" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/><circle class="orb" cx="322" cy="8" r="5" fill="currentColor"/></svg></a></p>
+    <p class="mono">Фриланс · WebGL и Three.js</p>
   </div>
 
   <div class="shell hero-body">
-    <h1><span>Real&#8209;time&nbsp;3D</span><span class="lit">for the browser</span></h1>
+    <h1><span>3D в реальном времени</span><span class="lit">прямо в браузере</span></h1>
     <p class="hero-note">
-      I write <b>Three.js</b> and <b>raw GLSL</b> — 3D product configurators, interactive
-      sites, and the engineering logic that sits behind them. The background is a shader
-      running right now, not a video.<span class="cursor-only"> Move the cursor.</span>
+      Я пишу на <b>Three.js</b> и <b>чистом GLSL</b> — 3D-конфигураторы товаров, интерактивные
+      сайты и инженерную логику за ними. Фон — это шейдер, который считается прямо сейчас,
+      а не видео.<span class="cursor-only"> Подвигайте курсором.</span>
     </p>
   </div>
 
   <div class="shell">
     <div class="hud mono">
       <span>GLSL · <span id="ctx">WebGL</span> · <span id="fps" class="live">—</span> FPS</span>
-      <span>Hand-written shader, no libraries</span>
-      <span><i class="dot" aria-hidden="true"></i>Available for contract</span>
+      <span>Шейдер написан руками, без библиотек</span>
+      <span><i class="dot" aria-hidden="true"></i>Открыт для проектов</span>
     </div>
   </div>
 </header>
@@ -673,38 +670,40 @@
        =================================================================== -->
   <section class="band shell" aria-labelledby="do-t">
     <div class="band-head">
-      <p class="mono">01 — Capability</p>
-      <h2 id="do-t">What I get hired for</h2>
+      <p class="mono">01 — Возможности</p>
+      <h2 id="do-t">Для чего меня нанимают</h2>
     </div>
 
     <div class="ledger">
       <div class="row-do">
         <p class="mono">01</p>
-        <h3>3D product configurators</h3>
+        <h3>3D-конфигураторы товаров</h3>
         <p>
-          The buyer specifies the product on screen — parts snap together, the price follows
-          the layout, and the finished scene leaves as <b>AR</b>, a render, or a brief the
-          factory can read. Runs in a tab, nothing to install.
+          Покупатель собирает товар прямо на экране — детали защёлкиваются друг в друга,
+          цена следует за раскладкой, а готовая сцена уходит дальше как <b>AR</b>, рендер
+          или техзадание, понятное производству. Работает во вкладке браузера, ничего
+          устанавливать не нужно.
         </p>
       </div>
 
       <div class="row-do">
         <p class="mono">02</p>
-        <h3>WebGL &amp; GLSL</h3>
+        <h3>WebGL и GLSL</h3>
         <p>
-          Shaders written for the brief instead of pulled off a shelf: cursor physics,
-          parametric geometry, generative material, scroll-bound camera. Built to hold the
-          <b>frame budget on a laptop GPU</b>, not just on my machine.
+          Шейдеры пишутся под конкретную задачу, а не берутся с полки: физика курсора,
+          параметрическая геометрия, генеративный материал, камера, привязанная к скроллу.
+          Рассчитаны на то, чтобы держать <b>частоту кадров на GPU обычного ноутбука</b>,
+          а не только на моей машине.
         </p>
       </div>
 
       <div class="row-do">
         <p class="mono">03</p>
-        <h3>Complex domain logic in the browser</h3>
+        <h3>Сложная бизнес-логика в браузере</h3>
         <p>
-          Selection engines, parametric catalogues, live quoting, legacy databases brought
-          onto the web. This is the part that makes a configurator <b>a tool people order
-          from</b> rather than a showreel.
+          Движки подбора, параметрические каталоги, расчёт стоимости на лету, legacy-базы
+          данных, перенесённые в веб. Именно это превращает конфигуратор в <b>инструмент,
+          из которого заказывают</b>, а не в демо-ролик.
         </p>
       </div>
     </div>
@@ -715,69 +714,70 @@
        =================================================================== -->
   <section class="band shell" aria-labelledby="cfg-t">
     <div class="band-head">
-      <p class="mono">02 — For manufacturers</p>
-      <h2 id="cfg-t">Configurators that quote the job</h2>
-      <p class="mono">In production</p>
+      <p class="mono">02 — Для производителей</p>
+      <h2 id="cfg-t">Конфигураторы, которые сами считают стоимость</h2>
+      <p class="mono">Уже в работе</p>
     </div>
 
     <div class="cfgs">
 
       <article class="cfg">
         <figure class="cfg-shot">
-          <img src="assets/standes.jpg" width="1200" height="675" loading="lazy" decoding="async"
-               alt="Standes: a retail room laid out with shelving units in 3D, catalogue on the left and a running quote on the right">
+          <img src="../assets/standes.jpg" width="1200" height="675" loading="lazy" decoding="async"
+               alt="Standes: торговый зал с расставленными в 3D стеллажами, каталог слева и смета в реальном времени справа">
         </figure>
         <div class="cfg-body">
           <p class="mono cfg-name">Standes</p>
-          <h3>3D shelving configurator</h3>
+          <h3>3D-конфигуратор стеллажей</h3>
           <p>
-            The customer measures out the room, drops in racking, shelves and display cases,
-            and the quote follows every change. The finished layout opens in <b>AR</b> on a
-            phone, renders to an image, or goes to the factory as a brief — without a call to
-            a sales rep.
+            Клиент размечает помещение, расставляет стеллажи, полки и витрины, а смета
+            обновляется на каждое изменение. Готовая раскладка открывается в <b>AR</b> на
+            телефоне, рендерится в картинку или уходит на производство как техзадание —
+            без звонка менеджеру.
           </p>
-          <p class="mono cfg-spec">Three.js · 3D and 2D views · AR · live pricing · export</p>
-          <a class="cfg-read mono" href="case/standes/">
-            <span>Read the case</span><span class="arw" aria-hidden="true">→</span>
+          <p class="mono cfg-spec">Three.js · 3D и 2D-виды · AR · расчёт стоимости на лету · экспорт</p>
+          <a class="cfg-read mono" href="../case/standes/">
+            <span>Читать кейс</span><span class="arw" aria-hidden="true">→</span>
           </a>
         </div>
       </article>
 
       <article class="cfg">
         <figure class="cfg-shot">
-          <img src="assets/ventprom.jpg" width="1200" height="605" loading="lazy" decoding="async"
-               alt="Ventprom: a duct fitting drawn to the entered dimensions with dimension lines, beside the input form and price">
+          <img src="../assets/ventprom.jpg" width="1200" height="605" loading="lazy" decoding="async"
+               alt="Ventprom: деталь воздуховода, построенная по введённым размерам, с размерными линиями, рядом форма ввода и цена">
         </figure>
         <div class="cfg-body">
           <p class="mono cfg-name">Ventprom</p>
-          <h3>Parametric duct fittings</h3>
+          <h3>Параметрические воздуховоды</h3>
           <p>
-            You give it dimensions, material and connection type, and the part redraws with
-            its <b>dimension lines</b> as you type. Bends, reducers, tees, saddles and cowls,
-            each ending in a costed specification and a quote instead of a thread of emails.
+            Вы задаёте размеры, материал и тип соединения — деталь перерисовывается вместе
+            со своими <b>размерными линиями</b> прямо по ходу ввода. Отводы, переходы,
+            тройники, врезки и зонты — каждый заканчивается спецификацией со стоимостью и
+            сметой вместо переписки по почте.
           </p>
-          <p class="mono cfg-spec">Parametric preview · dimension lines · costed spec</p>
-          <a class="cfg-read mono" href="case/ventprom/">
-            <span>Read the case</span><span class="arw" aria-hidden="true">→</span>
+          <p class="mono cfg-spec">Параметрический предпросмотр · размерные линии · спецификация со стоимостью</p>
+          <a class="cfg-read mono" href="../case/ventprom/">
+            <span>Читать кейс</span><span class="arw" aria-hidden="true">→</span>
           </a>
         </div>
       </article>
 
       <article class="cfg">
         <figure class="cfg-shot">
-          <img src="assets/ventmarket.jpg" width="1200" height="600" loading="lazy" decoding="async"
-               alt="Ventmarket: an online fan selection screen where the engineer sets an operating point">
+          <img src="../assets/ventmarket.jpg" width="1200" height="600" loading="lazy" decoding="async"
+               alt="Ventmarket: экран онлайн-подбора вентилятора, где инженер задаёт рабочую точку">
         </figure>
         <div class="cfg-body">
           <p class="mono cfg-name">Ventmarket</p>
-          <h3>Selection by operating point</h3>
+          <h3>Подбор по рабочей точке</h3>
           <p>
-            The engineer enters airflow and total pressure. The system picks the unit, draws
-            the curve through the <b>operating point</b> and builds the order around it —
-            across a catalogue of 400-plus units and roughly 20,000 polynomial curves, with
-            acoustics, drive selection and cost of ownership alongside.
+            Инженер вводит расход воздуха и полное давление. Система подбирает установку,
+            проводит кривую через <b>рабочую точку</b> и формирует заказ — по каталогу из
+            400+ моделей и примерно 20 000 полиномиальных кривых, с акустикой, подбором
+            привода и стоимостью владения в комплекте.
           </p>
-          <p class="mono cfg-spec">400+ units · ~20,000 curves · order, quote, CRM handoff</p>
+          <p class="mono cfg-spec">400+ моделей · ~20 000 кривых · заказ, смета, передача в CRM</p>
         </div>
       </article>
 
@@ -789,85 +789,85 @@
        =================================================================== -->
   <section class="band shell" aria-labelledby="demo-t">
     <div class="band-head">
-      <p class="mono">03 — Live</p>
-      <h2 id="demo-t">Five things to open</h2>
-      <p class="mono">Click, drag, scroll — they run</p>
+      <p class="mono">03 — Живые демо</p>
+      <h2 id="demo-t">Пять демо, которые стоит открыть</h2>
+      <p class="mono">Кликайте, тащите, скролльте — всё работает</p>
     </div>
 
     <div class="demos">
 
-      <a class="demo" href="work/aurum/">
+      <a class="demo" href="../work/aurum/">
         <figure class="thumb">
-          <img src="assets/aurum.jpg" width="1000" height="562" decoding="async"
-               alt="AURUM: a bronze horse sculpture lit against a dark ground, with the title Bronze and Time">
+          <img src="../assets/aurum.jpg" width="1000" height="562" decoding="async"
+               alt="AURUM: бронзовая скульптура коня на тёмном фоне, с заголовком Bronze and Time">
         </figure>
         <div class="demo-body">
           <div class="demo-name">
             <h3>Aurum</h3>
-            <span class="mono">GLSL · scroll</span>
+            <span class="mono">GLSL · скролл</span>
           </div>
-          <p>A bronze sculpture rendered in raw WebGL. The camera orbits a full 360° as you scroll, with the lighting and the grain computed per pixel.</p>
-          <span class="go mono"><span>Open</span><span class="arw">→</span></span>
+          <p>Бронзовая скульптура, отрисованная на чистом WebGL. Камера облетает её на полные 360° по скроллу, а освещение и зерно считаются попиксельно.</p>
+          <span class="go mono"><span>Открыть</span><span class="arw">→</span></span>
         </div>
       </a>
 
-      <a class="demo" href="work/signal/">
+      <a class="demo" href="../work/signal/">
         <figure class="thumb">
-          <img src="assets/signal.jpg" width="1000" height="562" loading="lazy" decoding="async"
-               alt="SIGNAL: a volumetric coin bearing the ticker $SIGNAL beside a panel of live shader parameters">
+          <img src="../assets/signal.jpg" width="1000" height="562" loading="lazy" decoding="async"
+               alt="SIGNAL: объёмная монета с тикером $SIGNAL рядом с панелью живых параметров шейдера">
         </figure>
         <div class="demo-body">
           <div class="demo-name">
             <h3>Signal</h3>
-            <span class="mono">Generative</span>
+            <span class="mono">Генеративно</span>
           </div>
-          <p>Type any ticker. Geometry, palette and motion re-roll from its hash — live, in one file.</p>
-          <span class="go mono"><span>Open</span><span class="arw">→</span></span>
+          <p>Введите любой тикер. Геометрия, палитра и движение пересчитываются из его хэша — прямо на глазах, в одном файле.</p>
+          <span class="go mono"><span>Открыть</span><span class="arw">→</span></span>
         </div>
       </a>
 
-      <a class="demo" href="work/vault/">
+      <a class="demo" href="../work/vault/">
         <figure class="thumb">
-          <img src="assets/vault.jpg" width="1000" height="562" loading="lazy" decoding="async"
-               alt="VAULT: a dark tokenomics dashboard with an emission curve, key metrics and a particle supply sphere">
+          <img src="../assets/vault.jpg" width="1000" height="562" loading="lazy" decoding="async"
+               alt="VAULT: тёмный токеномический дашборд с кривой эмиссии, ключевыми метриками и сферой предложения из частиц">
         </figure>
         <div class="demo-body">
           <div class="demo-name">
             <h3>Vault</h3>
-            <span class="mono">Data · WebGL</span>
+            <span class="mono">Данные · WebGL</span>
           </div>
-          <p>Emission curve, vesting schedule and a 4,000-particle supply sphere, all driven off one state object.</p>
-          <span class="go mono"><span>Open</span><span class="arw">→</span></span>
+          <p>Кривая эмиссии, график вестинга и сфера предложения из 4000 частиц — всё управляется одним объектом состояния.</p>
+          <span class="go mono"><span>Открыть</span><span class="arw">→</span></span>
         </div>
       </a>
 
-      <a class="demo" href="work/ferro/">
+      <a class="demo" href="../work/ferro/">
         <figure class="thumb">
-          <img src="assets/ferro.jpg" width="1000" height="562" loading="lazy" decoding="async"
-               alt="Ferro: a light studio landing page with a full-bleed portrait and the headline Bold ideas, shipped with quiet precision">
+          <img src="../assets/ferro.jpg" width="1000" height="562" loading="lazy" decoding="async"
+               alt="Ferro: лендинг светостудии с портретом на всю ширину и заголовком Bold ideas, shipped with quiet precision">
         </figure>
         <div class="demo-body">
           <div class="demo-name">
             <h3>Ferro</h3>
-            <span class="mono">Cursor · mask</span>
+            <span class="mono">Курсор · маска</span>
           </div>
-          <p>A studio landing page where a liquid cursor tears open a second image directly under the pointer.</p>
-          <span class="go mono"><span>Open</span><span class="arw">→</span></span>
+          <p>Лендинг студии, где жидкий курсор вскрывает второе изображение прямо под указателем.</p>
+          <span class="go mono"><span>Открыть</span><span class="arw">→</span></span>
         </div>
       </a>
 
-      <a class="demo" href="work/flux/">
+      <a class="demo" href="../work/flux/">
         <figure class="thumb">
-          <img src="assets/flux.jpg" width="1000" height="562" loading="lazy" decoding="async"
-               alt="Fluxwave: a neon flower on a cliff at dusk with the Fluxwave wordmark set over live video">
+          <img src="../assets/flux.jpg" width="1000" height="562" loading="lazy" decoding="async"
+               alt="Fluxwave: неоновый цветок на скале в сумерках с надписью Fluxwave на живом видео">
         </figure>
         <div class="demo-body">
           <div class="demo-name">
             <h3>Fluxwave</h3>
-            <span class="mono">Video · cursor</span>
+            <span class="mono">Видео · курсор</span>
           </div>
-          <p>Neon opening screen on live background video, with cursor physics written from scratch.</p>
-          <span class="go mono"><span>Open</span><span class="arw">→</span></span>
+          <p>Неоновый первый экран на живом фоновом видео, с физикой курсора, написанной с нуля.</p>
+          <span class="go mono"><span>Открыть</span><span class="arw">→</span></span>
         </div>
       </a>
 
@@ -879,43 +879,43 @@
        =================================================================== -->
   <section class="band shell" aria-labelledby="work-t">
     <div class="band-head">
-      <p class="mono">04 — Selected work</p>
-      <h2 id="work-t">Shipped, in production</h2>
-      <p class="mono">Hover for a look</p>
+      <p class="mono">04 — Избранные проекты</p>
+      <h2 id="work-t">Сделано и работает</h2>
+      <p class="mono">Наведите, чтобы посмотреть</p>
     </div>
 
     <div class="index" id="index">
 
-      <article class="job" data-peek="assets/dios.jpg">
+      <article class="job" data-peek="../assets/dios.jpg">
         <p class="mono">01</p>
         <h3>Dios+</h3>
-        <p>A fleet globe: ships and aircraft moving along great-circle routes to 28 cities, on NASA textures with a cloud layer and atmospheric halo.</p>
-        <p class="mono tags">Three.js · globe</p>
-        <img src="assets/dios.jpg" loading="lazy" alt="Dios+: a 3D globe with cargo ships and aircraft on great-circle routes between world cities">
+        <p>Глобус флота: суда и самолёты движутся по ортодромиям к 28 городам, на текстурах NASA со слоем облаков и атмосферным ореолом.</p>
+        <p class="mono tags">Three.js · глобус</p>
+        <img src="../assets/dios.jpg" loading="lazy" alt="Dios+: 3D-глобус с грузовыми судами и самолётами на ортодромиях между городами мира">
       </article>
 
-      <article class="job" data-peek="assets/srez.jpg">
+      <article class="job" data-peek="../assets/srez.jpg">
         <p class="mono">02</p>
         <h3>Srez</h3>
-        <p>A materials catalogue that behaves like the wall: drag a raking light across the coating and the relief comes up, the way a plasterer checks a surface.</p>
-        <p class="mono tags">Interaction · art direction</p>
-        <img src="assets/srez.jpg" loading="lazy" alt="Srez: a decorative coating shown under a movable raking light that reveals its relief">
+        <p>Каталог материалов, который ведёт себя как настоящая стена: проведите скользящим светом по покрытию — и проступит рельеф, точно так же штукатур проверяет поверхность.</p>
+        <p class="mono tags">Интерактив · арт-дирекшн</p>
+        <img src="../assets/srez.jpg" loading="lazy" alt="Srez: декоративное покрытие под подвижным скользящим светом, который проявляет его рельеф">
       </article>
 
-      <article class="job" data-peek="assets/vertro.jpg">
+      <article class="job" data-peek="../assets/vertro.jpg">
         <p class="mono">03</p>
         <h3>Vertro</h3>
-        <p>A desktop engineering suite pulled out of VB6 and Access and rebuilt for the web: nine calculation modules, 63 tables, 3,471 records, one URL.</p>
-        <p class="mono tags">Legacy migration</p>
-        <img src="assets/vertro.jpg" loading="lazy" alt="Vertro: nine calculation modules on a web home screen with counters for the migrated database">
+        <p>Инженерный десктопный комплекс, перенесённый из VB6 и Access в веб: девять расчётных модулей, 63 таблицы, 3471 запись, один адрес.</p>
+        <p class="mono tags">Миграция legacy-системы</p>
+        <img src="../assets/vertro.jpg" loading="lazy" alt="Vertro: девять расчётных модулей на веб-экране с счётчиками перенесённой базы данных">
       </article>
 
     </div>
 
     <p class="also">
-      Also built: computer-vision overlays for live streams, spaced-repetition learning
-      platforms, a Spring Boot backend with 53 endpoints, and a speech-synthesis model.
-      Happy to walk through any of it.
+      Также делал: оверлеи с компьютерным зрением для стримов, платформы обучения по
+      интервальным повторениям, backend на Spring Boot с 53 эндпоинтами и модель синтеза
+      речи. Готов подробно рассказать про любой из проектов.
     </p>
   </section>
 
@@ -926,7 +926,7 @@
      ===================================================================== -->
 <section class="contact shell" id="contact">
   <div>
-    <h2>Got a configurator to build, or a scene that has to run at 60 fps?</h2>
+    <h2>Нужен конфигуратор или сцена, которая держит 60 fps?</h2>
     <a class="handle" href="https://t.me/smirnovarturr" target="_blank" rel="noopener">
       Telegram @smirnovarturr <span aria-hidden="true">→</span>
     </a>
@@ -937,15 +937,15 @@
   </div>
 
   <div class="contact-meta mono">
-    <span>Currently available for contract work</span>
-    <span>Belgrade · UTC+2 — a full European day and US East Coast mornings</span>
-    <span>Usually a reply within the hour</span>
+    <span>Сейчас свободен для проектов</span>
+    <span>Белград · UTC+2 — полный рабочий день по Европе и утро по Восточному побережью США</span>
+    <span>Обычно отвечаю в течение часа</span>
   </div>
 </section>
 
 <footer class="shell mono">
-  <span>Artur Smirnov — real-time 3D &amp; browser engineering</span>
-  <span>No framework, no build step</span>
+  <span>Артур Смирнов — 3D в реальном времени и браузерная инженерия</span>
+  <span>Без фреймворков и шага сборки</span>
 </footer>
 
 <img id="peek" alt="" aria-hidden="true">
@@ -970,7 +970,7 @@
 
   if (!gl) {
     canvas.style.display = 'none';
-    if (ctxOut) ctxOut.textContent = 'no webgl';
+    if (ctxOut) ctxOut.textContent = 'нет webgl';
     if (fpsOut) { fpsOut.textContent = '–'; fpsOut.classList.remove('live'); }
     return;
   }
@@ -1157,7 +1157,7 @@
     gl.uniform2f(uLight, light.x, light.y);
     gl.uniform1f(uTime, 12.0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
-    if (fpsOut) { fpsOut.textContent = 'still'; fpsOut.classList.remove('live'); }
+    if (fpsOut) { fpsOut.textContent = 'статично'; fpsOut.classList.remove('live'); }
   }
 })();
 

@@ -1,36 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="utf-8">
 <script src="/works/js/gad-loader.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#07080A">
-<title>Ventprom — parametric duct-fitting configurator · Artur Smirnov</title>
-<meta name="description" content="A ventilation fabricator's catalogue is a set of parameters, not a list of products. Type the dimensions, the fitting is generated on the spot, and the costed specification builds as you go.">
+<title>Ventprom — параметрический конфигуратор воздуховодов · Артур Смирнов</title>
+<meta name="description" content="Каталог вентиляционного завода — это набор параметров, а не список товаров. Вводишь размеры, деталь строится на месте, а спецификация со стоимостью собирается по ходу дела.">
 
-<link rel="canonical" href="https://smirnov-artur.github.io/webgl/case/ventprom/">
-<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
-<link rel="alternate icon" href="../../assets/icon-32.png" sizes="32x32">
-<link rel="apple-touch-icon" href="../../assets/icon-180.png">
+<link rel="canonical" href="https://smirnov-artur.github.io/webgl/case/ventprom/ru/">
+<link rel="icon" href="../../../assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="../../../assets/icon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="../../../assets/icon-180.png">
 
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Artur Smirnov">
-<meta property="og:url" content="https://smirnov-artur.github.io/webgl/case/ventprom/">
-<meta property="og:title" content="Ventprom — parametric duct-fitting configurator">
-<meta property="og:description" content="Type the dimensions, the fitting draws itself with its dimension lines, and the costed specification builds as you go.">
+<meta property="og:url" content="https://smirnov-artur.github.io/webgl/case/ventprom/ru/">
+<meta property="og:title" content="Ventprom — параметрический конфигуратор воздуховодов">
+<meta property="og:description" content="Вводишь размеры — деталь сама прорисовывается со своими размерными линиями, а спецификация со стоимостью собирается по ходу дела.">
 <meta property="og:image" content="https://smirnov-artur.github.io/webgl/assets/og-ventprom.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Ventprom — a duct fitting generated from typed dimensions, with a live preview and a running specification">
+<meta property="og:image:alt" content="Ventprom — деталь воздуховода, построенная по введённым размерам, с живым превью и растущей спецификацией">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Ventprom — parametric duct-fitting configurator">
-<meta name="twitter:description" content="Type the dimensions, the fitting draws itself with its dimension lines, and the costed specification builds as you go.">
+<meta name="twitter:title" content="Ventprom — параметрический конфигуратор воздуховодов">
+<meta name="twitter:description" content="Вводишь размеры — деталь сама прорисовывается со своими размерными линиями, а спецификация со стоимостью собирается по ходу дела.">
 <meta name="twitter:image" content="https://smirnov-artur.github.io/webgl/assets/og-ventprom.jpg">
 
-<link rel="preload" href="../../assets/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="../../assets/fonts/plexmono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../../../assets/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../../../assets/fonts/plexmono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
 
 <style>
   /* self-hosted latin subsets — same two faces as the front page */
@@ -39,14 +39,14 @@
     font-style: normal;
     font-weight: 100 900;
     font-display: swap;
-    src: url("../../assets/fonts/archivo-var-latin.woff2") format("woff2");
+    src: url("../../../assets/fonts/archivo-var-latin.woff2") format("woff2");
   }
   @font-face {
     font-family: "IBM Plex Mono";
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url("../../assets/fonts/plexmono-400-latin.woff2") format("woff2");
+    src: url("../../../assets/fonts/plexmono-400-latin.woff2") format("woff2");
   }
 
   :root {
@@ -179,8 +179,6 @@
   h1 {
     margin: 0;
     font-weight: 800;
-    /* the top end matches the front page; tracking follows the rule that the
-       bigger the size, the harder the negative — about −4% at 90px and up */
     font-size: clamp(2.6rem, 8.2vw, 6.6rem);
     line-height: 0.9;
     letter-spacing: -0.04em;
@@ -324,7 +322,7 @@
     aspect-ratio: 16 / 9;
     background: #05060A;
     border-bottom: 1px solid var(--line);
-    touch-action: pan-y;          /* nothing here should ever eat a page scroll */
+    touch-action: pan-y;
   }
 
   .rig-controls {
@@ -354,7 +352,6 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* type the dimension you actually have, instead of hunting for it with a thumb */
   .rig-ctl input[type="number"] {
     width: 5.5ch;
     padding: 0 0 2px;
@@ -388,7 +385,7 @@
     margin: 0;
     background: transparent;
     cursor: ew-resize;
-    touch-action: pan-y;          /* horizontal drag sets the value, vertical still scrolls the page */
+    touch-action: pan-y;
   }
 
   .rig-ctl input[type="range"]::-webkit-slider-runnable-track {
@@ -403,7 +400,7 @@
     margin-top: -5.5px;
     border: 0;
     background: var(--brass);
-    transform: rotate(45deg);     /* the same diamond as the wordmark */
+    transform: rotate(45deg);
   }
 
   .rig-ctl input[type="range"]::-moz-range-track { height: 2px; background: var(--line-lit); }
@@ -479,7 +476,6 @@
     color: var(--steel);
   }
 
-  /* the generated drawing itself */
   #duct .e   { stroke: var(--steel);   stroke-width: 1; vector-effect: non-scaling-stroke; }
   #duct .eh  { stroke: var(--dim);     stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 5 5; }
   #duct .dim { stroke: var(--mute);    stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -488,7 +484,6 @@
   #duct text { font-family: var(--f-mono); fill: var(--ink); letter-spacing: 0.05em; }
   #duct .k { fill: var(--brass); }
 
-  /* before → now ledger */
   .shift { margin: 0; }
 
   .shift > div {
@@ -506,7 +501,6 @@
   .shift .now { color: var(--ink); }
   .shift .arw { color: var(--brass); text-align: center; font-family: var(--f-mono); }
 
-  /* stack */
   .stack-list {
     display: flex;
     flex-wrap: wrap;
@@ -522,7 +516,6 @@
     color: var(--ink);
   }
 
-  /* the shapes the generator covers — a dense mono index */
   .range {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
@@ -612,7 +605,7 @@
   }
 
   .handle {
-    display: flex;          /* one per line — two contacts, not one run-on */
+    display: flex;
     width: fit-content;
     align-items: center;
     gap: 0.7rem;
@@ -627,8 +620,6 @@
   .handle:hover { border-bottom-color: var(--brass); }
   .handle + .handle { margin-top: 0.9rem; }
 
-  /* who is behind this, and what the next move is — the two things a page
-     like this usually forgets to say */
   .pitch {
     margin: 0 0 1.3rem;
     color: var(--mute);
@@ -678,13 +669,12 @@
     .facts div { border-bottom: 1px solid var(--line); padding-bottom: 0.6rem; margin-bottom: 0.6rem; }
     .facts div:last-child { border-bottom: 0; margin-bottom: 0; }
 
-    /* a 1200px-wide UI shrunk to a phone is a smudge — crop into the part that matters */
     figure.shot img { aspect-ratio: 3 / 2; object-fit: cover; object-position: 56% 34%; }
 
     .shift > div { grid-template-columns: minmax(0, 1fr); }
     .shift .arw { display: none; }
     .shift .was { order: 1; }
-    .shift .was::before { content: "was — "; color: var(--dim); }
+    .shift .was::before { content: "было — "; color: var(--dim); }
     .shift .now { order: 0; }
     figcaption { display: block; }
 
@@ -703,33 +693,33 @@
 <body>
 
 <div class="shell bar">
-  <a class="mark" href="../../"><i aria-hidden="true"></i>Artur Smirnov</a>
-  <a class="gad-mark" href="https://smirnov-artur.github.io/works/en" aria-label="g.a.d."><svg class="gad-logo" viewBox="0 0 355 110" role="img" aria-label="g.a.d."><path fill="currentColor" d="M53.7 66.8V57.9L54.3 55.8V43.7L53.7 41.7V27.6H70.8V66Q70.8 75.8 66.4 82.6Q61.9 89.5 54 93.1Q46.1 96.7 35.6 96.7Q28.3 96.7 22.2 94.8Q16.1 92.9 10.1 89.1V76Q15.7 80.3 21.9 82.2Q28.1 84 34.5 84Q43.8 84 48.7 79.9Q53.7 75.7 53.7 66.8ZM30.5 74.8Q23.2 74.8 17.4 71.8Q11.6 68.8 8.3 63.3Q4.9 57.8 4.9 50.5Q4.9 43.1 8.3 37.6Q11.6 32.2 17.4 29.1Q23.2 26.1 30.5 26.1Q36 26.1 40.6 27.8Q45.2 29.5 48.8 32.3Q52.4 35 54.9 38.3Q57.4 41.5 58.7 44.8Q60 48.1 60 50.7Q60 54.1 57.9 58.2Q55.9 62.4 52.1 66.2Q48.3 70 42.8 72.4Q37.4 74.8 30.5 74.8ZM36.2 63Q41.9 63 46.4 59.9Q50.9 56.9 54.3 50.5Q50.9 43.9 46.4 40.9Q41.8 37.9 36.2 37.9Q31.9 37.9 28.7 39.4Q25.6 41 23.9 43.8Q22.1 46.6 22.1 50.5Q22.1 54.2 23.8 57Q25.5 59.9 28.6 61.4Q31.8 63 36.2 63Z M84.7 80.9Q81.9 80.9 79.6 79.6Q77.4 78.3 76.1 76Q74.8 73.8 74.8 71.1Q74.8 68.3 76.1 66.1Q77.4 63.9 79.6 62.6Q81.9 61.2 84.7 61.2Q87.4 61.2 89.6 62.6Q91.8 63.9 93.2 66.1Q94.5 68.3 94.5 71.1Q94.5 73.8 93.2 76Q91.8 78.3 89.6 79.6Q87.4 80.9 84.7 80.9Z M146.4 80 144.1 61 146.6 53.8 144.1 46.7 146.4 27.6H164.2L161 53.8L164.2 80ZM150.7 53.8Q149.3 62.2 145.4 68.4Q141.6 74.6 135.7 78Q129.8 81.5 122.4 81.5Q114.7 81.5 108.9 78Q103 74.5 99.7 68.3Q96.4 62.1 96.4 53.8Q96.4 45.5 99.7 39.3Q103 33.1 108.9 29.6Q114.7 26.1 122.4 26.1Q129.8 26.1 135.7 29.5Q141.6 33 145.5 39.2Q149.4 45.3 150.7 53.8ZM113.7 53.8Q113.7 58 115.4 61.3Q117.2 64.5 120.3 66.4Q123.3 68.3 127.4 68.3Q131.4 68.3 135.1 66.4Q138.7 64.5 141.5 61.3Q144.2 58 145.6 53.8Q144.2 49.5 141.5 46.3Q138.7 43 135.1 41.1Q131.4 39.2 127.4 39.2Q123.3 39.2 120.3 41.1Q117.2 43 115.4 46.3Q113.7 49.5 113.7 53.8Z M176.9 80.9Q174.2 80.9 171.9 79.6Q169.7 78.3 168.4 76Q167.1 73.8 167.1 71.1Q167.1 68.3 168.4 66.1Q169.7 63.9 171.9 62.6Q174.2 61.2 176.9 61.2Q179.7 61.2 181.9 62.6Q184.1 63.9 185.4 66.1Q186.8 68.3 186.8 71.1Q186.8 73.8 185.4 76Q184.1 78.3 181.9 79.6Q179.7 80.9 176.9 80.9Z M239 80 236.7 60.2 239.8 54 236.8 46.1 241 9.2H258.8L253.5 52.5L256.7 80ZM242.9 53.8Q241.6 62.2 237.7 68.4Q233.8 74.6 228 78Q222.1 81.5 214.7 81.5Q207 81.5 201.1 78Q195.3 74.5 192 68.3Q188.7 62.1 188.7 53.8Q188.7 45.5 192 39.3Q195.3 33.1 201.1 29.6Q207 26.1 214.7 26.1Q222.1 26.1 228 29.5Q233.8 33 237.8 39.2Q241.7 45.3 242.9 53.8ZM206 53.8Q206 58 207.7 61.3Q209.5 64.5 212.5 66.4Q215.6 68.3 219.7 68.3Q223.7 68.3 227.4 66.4Q231 64.5 233.7 61.3Q236.5 58 237.9 53.8Q236.5 49.5 233.7 46.3Q231 43 227.4 41.1Q223.7 39.2 219.7 39.2Q215.6 39.2 212.5 41.1Q209.5 43 207.7 46.3Q206 49.5 206 53.8Z M269.4 80.9Q266.6 80.9 264.4 79.6Q262.1 78.3 260.8 76Q259.6 73.8 259.6 71.1Q259.6 68.3 260.8 66.1Q262.1 63.9 264.4 62.6Q266.6 61.2 269.4 61.2Q272.2 61.2 274.4 62.6Q276.6 63.9 277.9 66.1Q279.2 68.3 279.2 71.1Q279.2 73.8 277.9 76Q276.6 78.3 274.4 79.6Q272.2 80.9 269.4 80.9Z"/><circle class="ring" cx="322" cy="30" r="22" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" transform="rotate(-90 322 30)" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/><circle class="orb" cx="322" cy="8" r="5" fill="currentColor"/></svg></a>
-  <a class="back mono" href="../../"><span class="arw">←</span> Back to the work</a>
+  <a class="mark" href="../../../"><i aria-hidden="true"></i>Артур Смирнов</a>
+  <a class="gad-mark" href="https://smirnov-artur.github.io/works/" aria-label="g.a.d."><svg class="gad-logo" viewBox="0 0 355 110" role="img" aria-label="g.a.d."><path fill="currentColor" d="M53.7 66.8V57.9L54.3 55.8V43.7L53.7 41.7V27.6H70.8V66Q70.8 75.8 66.4 82.6Q61.9 89.5 54 93.1Q46.1 96.7 35.6 96.7Q28.3 96.7 22.2 94.8Q16.1 92.9 10.1 89.1V76Q15.7 80.3 21.9 82.2Q28.1 84 34.5 84Q43.8 84 48.7 79.9Q53.7 75.7 53.7 66.8ZM30.5 74.8Q23.2 74.8 17.4 71.8Q11.6 68.8 8.3 63.3Q4.9 57.8 4.9 50.5Q4.9 43.1 8.3 37.6Q11.6 32.2 17.4 29.1Q23.2 26.1 30.5 26.1Q36 26.1 40.6 27.8Q45.2 29.5 48.8 32.3Q52.4 35 54.9 38.3Q57.4 41.5 58.7 44.8Q60 48.1 60 50.7Q60 54.1 57.9 58.2Q55.9 62.4 52.1 66.2Q48.3 70 42.8 72.4Q37.4 74.8 30.5 74.8ZM36.2 63Q41.9 63 46.4 59.9Q50.9 56.9 54.3 50.5Q50.9 43.9 46.4 40.9Q41.8 37.9 36.2 37.9Q31.9 37.9 28.7 39.4Q25.6 41 23.9 43.8Q22.1 46.6 22.1 50.5Q22.1 54.2 23.8 57Q25.5 59.9 28.6 61.4Q31.8 63 36.2 63Z M84.7 80.9Q81.9 80.9 79.6 79.6Q77.4 78.3 76.1 76Q74.8 73.8 74.8 71.1Q74.8 68.3 76.1 66.1Q77.4 63.9 79.6 62.6Q81.9 61.2 84.7 61.2Q87.4 61.2 89.6 62.6Q91.8 63.9 93.2 66.1Q94.5 68.3 94.5 71.1Q94.5 73.8 93.2 76Q91.8 78.3 89.6 79.6Q87.4 80.9 84.7 80.9Z M146.4 80 144.1 61 146.6 53.8 144.1 46.7 146.4 27.6H164.2L161 53.8L164.2 80ZM150.7 53.8Q149.3 62.2 145.4 68.4Q141.6 74.6 135.7 78Q129.8 81.5 122.4 81.5Q114.7 81.5 108.9 78Q103 74.5 99.7 68.3Q96.4 62.1 96.4 53.8Q96.4 45.5 99.7 39.3Q103 33.1 108.9 29.6Q114.7 26.1 122.4 26.1Q129.8 26.1 135.7 29.5Q141.6 33 145.5 39.2Q149.4 45.3 150.7 53.8ZM113.7 53.8Q113.7 58 115.4 61.3Q117.2 64.5 120.3 66.4Q123.3 68.3 127.4 68.3Q131.4 68.3 135.1 66.4Q138.7 64.5 141.5 61.3Q144.2 58 145.6 53.8Q144.2 49.5 141.5 46.3Q138.7 43 135.1 41.1Q131.4 39.2 127.4 39.2Q123.3 39.2 120.3 41.1Q117.2 43 115.4 46.3Q113.7 49.5 113.7 53.8Z M176.9 80.9Q174.2 80.9 171.9 79.6Q169.7 78.3 168.4 76Q167.1 73.8 167.1 71.1Q167.1 68.3 168.4 66.1Q169.7 63.9 171.9 62.6Q174.2 61.2 176.9 61.2Q179.7 61.2 181.9 62.6Q184.1 63.9 185.4 66.1Q186.8 68.3 186.8 71.1Q186.8 73.8 185.4 76Q184.1 78.3 181.9 79.6Q179.7 80.9 176.9 80.9Z M239 80 236.7 60.2 239.8 54 236.8 46.1 241 9.2H258.8L253.5 52.5L256.7 80ZM242.9 53.8Q241.6 62.2 237.7 68.4Q233.8 74.6 228 78Q222.1 81.5 214.7 81.5Q207 81.5 201.1 78Q195.3 74.5 192 68.3Q188.7 62.1 188.7 53.8Q188.7 45.5 192 39.3Q195.3 33.1 201.1 29.6Q207 26.1 214.7 26.1Q222.1 26.1 228 29.5Q233.8 33 237.8 39.2Q241.7 45.3 242.9 53.8ZM206 53.8Q206 58 207.7 61.3Q209.5 64.5 212.5 66.4Q215.6 68.3 219.7 68.3Q223.7 68.3 227.4 66.4Q231 64.5 233.7 61.3Q236.5 58 237.9 53.8Q236.5 49.5 233.7 46.3Q231 43 227.4 41.1Q223.7 39.2 219.7 39.2Q215.6 39.2 212.5 41.1Q209.5 43 207.7 46.3Q206 49.5 206 53.8Z M269.4 80.9Q266.6 80.9 264.4 79.6Q262.1 78.3 260.8 76Q259.6 73.8 259.6 71.1Q259.6 68.3 260.8 66.1Q262.1 63.9 264.4 62.6Q266.6 61.2 269.4 61.2Q272.2 61.2 274.4 62.6Q276.6 63.9 277.9 66.1Q279.2 68.3 279.2 71.1Q279.2 73.8 277.9 76Q276.6 78.3 274.4 79.6Q272.2 80.9 269.4 80.9Z"/><circle class="ring" cx="322" cy="30" r="22" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" transform="rotate(-90 322 30)" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/><circle class="orb" cx="322" cy="8" r="5" fill="currentColor"/></svg></a>
+  <a class="back mono" href="../../../"><span class="arw">←</span> Назад к работам</a>
 </div>
 
 <header class="masthead shell">
-  <p class="eyebrow mono">Case · <b>Ventprom</b> · Ventilation fittings manufacturer</p>
+  <p class="eyebrow mono">Кейс · <b>Ventprom</b> · производитель вентиляционных фитингов</p>
 
-  <h1><span>Parametric duct</span><span class="lit">fittings</span></h1>
+  <h1><span>Фитинги воздуховодов</span><span class="lit">по параметрам</span></h1>
 
   <p class="lead">
-    The catalogue is a set of parameters, not a list of products. Type the dimensions and
-    the part <b>draws itself</b>, with the cost beside it.
+    Каталог — это набор параметров, а не список товаров. Вводишь размеры, и деталь
+    <b>сама себя прорисовывает</b>, а стоимость встаёт рядом.
   </p>
 
   <div class="facts mono">
-    <div><span>Client</span><b>Ventilation fittings manufacturer</b></div>
-    <div><span>What it is</span><b>Parametric configurator + quoting</b></div>
-    <div><span>Where it runs</span><b>On the company site, in a browser tab</b></div>
+    <div><span>Клиент</span><b>Производитель вентиляционных фитингов</b></div>
+    <div><span>Что это</span><b>Параметрический конфигуратор и расчёт стоимости</b></div>
+    <div><span>Где работает</span><b>На сайте компании, прямо в браузере</b></div>
   </div>
 
   <figure class="shot">
-    <img src="../../assets/ventprom.jpg" width="1200" height="606" decoding="async"
-         alt="The Ventprom configurator: a list of fitting types on the left, a live preview of a rectangular duct section with dimension lines reading B: 300 and L: 1250 in the middle, and the parameter form with a running estimate on the right">
+    <img src="../../../assets/ventprom.jpg" width="1200" height="606" decoding="async"
+         alt="Конфигуратор Ventprom: список типов фитингов слева, живое превью прямоугольного участка воздуховода с размерными линиями B: 300 и L: 1250 посередине, и форма параметров с растущей оценкой стоимости справа">
     <figcaption class="mono">
-      <span>Fitting types, a live preview with dimension lines, parameters and the running estimate</span>
-      <span>Production UI, in Russian</span>
+      <span>Типы фитингов, живое превью с размерными линиями, параметры и растущая оценка стоимости</span>
+      <span>Скрин из продакшена</span>
     </figcaption>
   </figure>
 </header>
@@ -737,89 +727,89 @@
 <main class="shell">
 
   <!-- ======================================================================
-       01 — PROBLEM
+       01 — ПРОБЛЕМА
        =================================================================== -->
   <section class="cut" aria-labelledby="p-t">
     <div class="cut-head">
-      <p class="mono">01 — The problem</p>
-      <h2 id="p-t">There is nothing to put in a catalogue</h2>
+      <p class="mono">01 — Проблема</p>
+      <h2 id="p-t">В каталог просто нечего положить</h2>
     </div>
     <div class="cut-body">
       <p>
-        This factory doesn't make a hundred products. It makes a dozen shapes, each of which
-        becomes a product once you attach numbers to it. A straight run is a width, a height,
-        a length, a material and a connection at either end. <b>Change one number and it is a
-        different item at a different price.</b>
+        Завод не выпускает сотню товаров. Он выпускает десяток форм, и каждая становится
+        товаром только тогда, когда к ней привязали числа. Прямой участок — это ширина,
+        высота, длина, материал и соединение на каждом конце. <b>Поменяй одно число — и это
+        уже другое изделие по другой цене.</b>
       </p>
       <p>
-        Which means the range can't be listed, browsed or added to a basket. So a request
-        arrives as a description in words — usually dozens of lines of it — and someone in the
-        office draws each fitting to be sure of what was meant, works out the metal, prices it
-        and types the quote back. Every request, by hand, before anyone has ordered anything.
+        А значит, весь ассортимент нельзя выложить списком, пролистать или бросить в
+        корзину. Поэтому заявка приходит словами — обычно на десятки строк — и кто-то в
+        офисе перерисовывает каждый фитинг, чтобы понять, что имели в виду, считает металл,
+        назначает цену и печатает ответ. Каждую заявку — вручную, ещё до того, как что-то
+        заказали.
       </p>
     </div>
   </section>
 
   <!-- ======================================================================
-       02 — WHAT I BUILT
+       02 — ЧТО Я СДЕЛАЛ
        =================================================================== -->
   <section class="cut" aria-labelledby="b-t">
     <div class="cut-head">
-      <p class="mono">02 — What I built</p>
-      <h2 id="b-t">Numbers in, geometry out</h2>
+      <p class="mono">02 — Что я сделал</p>
+      <h2 id="b-t">На входе числа, на выходе геометрия</h2>
     </div>
     <div class="cut-body">
       <p>
-        A configurator where the product doesn't exist until you specify it. There is no
-        library of ready models to pick from, because there couldn't be one — the geometry is
-        generated from the parameters as they are entered, and redrawn on every keystroke.
+        Конфигуратор, где товара не существует, пока его не задали. Библиотеки готовых
+        моделей для выбора здесь нет и не может быть — геометрия строится из параметров по
+        ходу ввода и перерисовывается на каждое нажатие клавиши.
       </p>
 
-      <!-- one shape of it, running here, so the paragraph above is testable -->
       <div class="rig">
         <div class="rig-head mono">
-          <p class="live">Live — drag it, or type your size</p>
-          <p>Straight run · rectangular</p>
+          <p class="live">Живьём — потяни или впиши свой размер</p>
+          <p>Прямой участок · прямоугольный</p>
         </div>
 
         <svg class="rig-view" id="duct" role="img" aria-labelledby="duct-t" preserveAspectRatio="xMidYMid meet">
-          <title id="duct-t">A rectangular duct section drawn to the entered dimensions</title>
+          <title id="duct-t">Прямоугольный участок воздуховода, построенный по введённым размерам</title>
         </svg>
 
         <div class="rig-controls">
           <div class="rig-ctl">
             <div class="lab">
-              <label class="mono" for="num-a">Width A</label>
+              <label class="mono" for="num-a">Ширина A</label>
               <span class="val">
                 <input type="number" id="num-a" min="100" max="1000" step="1" value="500" inputmode="numeric">
-                <span class="unit">mm</span>
+                <span class="unit">мм</span>
               </span>
             </div>
-            <input type="range" id="in-a" min="100" max="1000" step="10" value="500" aria-label="Width A, slider">
+            <input type="range" id="in-a" min="100" max="1000" step="10" value="500" aria-label="Ширина A, слайдер">
           </div>
           <div class="rig-ctl">
             <div class="lab">
-              <label class="mono" for="num-b">Height B</label>
+              <label class="mono" for="num-b">Высота B</label>
               <span class="val">
                 <input type="number" id="num-b" min="100" max="1000" step="1" value="300" inputmode="numeric">
-                <span class="unit">mm</span>
+                <span class="unit">мм</span>
               </span>
             </div>
-            <input type="range" id="in-b" min="100" max="1000" step="10" value="300" aria-label="Height B, slider">
+            <input type="range" id="in-b" min="100" max="1000" step="10" value="300" aria-label="Высота B, слайдер">
           </div>
           <div class="rig-ctl">
             <div class="lab">
-              <label class="mono" for="num-l">Length L</label>
+              <label class="mono" for="num-l">Длина L</label>
               <span class="val">
                 <input type="number" id="num-l" min="250" max="2000" step="1" value="1250" inputmode="numeric">
-                <span class="unit">mm</span>
+                <span class="unit">мм</span>
               </span>
             </div>
-            <input type="range" id="in-l" min="250" max="2000" step="50" value="1250" aria-label="Length L, slider">
+            <input type="range" id="in-l" min="250" max="2000" step="50" value="1250" aria-label="Длина L, слайдер">
           </div>
           <div class="rig-ctl" style="grid-column: 1 / -1">
-            <span class="lab"><span class="mono">Sheet gauge</span><span class="val" id="out-t">0.7 mm</span></span>
-            <div class="rig-gauge" id="gauge" role="group" aria-label="Sheet gauge">
+            <span class="lab"><span class="mono">Толщина листа</span><span class="val" id="out-t">0.7 мм</span></span>
+            <div class="rig-gauge" id="gauge" role="group" aria-label="Толщина листа">
               <button type="button" data-t="0.5" aria-pressed="false">0.5</button>
               <button type="button" data-t="0.7" aria-pressed="true">0.7</button>
               <button type="button" data-t="0.9" aria-pressed="false">0.9</button>
@@ -831,154 +821,157 @@
         <div class="rig-out">
           <div>
             <span class="num" id="out-blank">1660</span>
-            <span class="mono">Blank width, mm</span>
+            <span class="mono">Развёртка, мм</span>
           </div>
           <div>
             <span class="num" id="out-area">2.08</span>
-            <span class="mono">Sheet, m²</span>
+            <span class="mono">Лист, м²</span>
           </div>
           <div>
             <span class="num" id="out-mass">11.4</span>
-            <span class="mono">Steel, kg</span>
+            <span class="mono">Сталь, кг</span>
           </div>
           <div class="cost">
             <span class="num" id="out-cost">€20.52</span>
-            <span class="mono">Indicative</span>
+            <span class="mono">Ориентировочно</span>
           </div>
         </div>
 
         <p class="rig-fine">
           <code>blank = 2 × (A + B) + 60 mm seam · mass = blank × L × gauge × 7.85 g/cm³</code><br>
-          Geometry and mass are computed, not mocked up. The cost line multiplies that mass by a
-          placeholder €1.80/kg for galvanised sheet — the production tool prices against the
-          client's own rates, across the whole nomenclature, and adds connections and fittings.
+          Геометрия и масса считаются по-настоящему, а не нарисованы для вида. Строка
+          стоимости умножает эту массу на условную ставку 1,80&nbsp;€/кг за оцинкованный
+          лист — рабочий инструмент считает по собственным расценкам клиента, по всей
+          номенклатуре, и добавляет соединения и фитинги.
         </p>
       </div>
 
       <ol class="steps">
         <li>
           <span class="mono">01</span>
-          <span><b>Pick the shape</b>A dozen families of fitting, each one a generator rather than a product.</span>
+          <span><b>Выбери форму</b>Десяток семейств фитингов, и каждое — генератор, а не товар.</span>
         </li>
         <li>
           <span class="mono">02</span>
-          <span><b>Type the numbers</b>Width, height, length, angle, material, connection at each end — the parameters the workshop already thinks in.</span>
+          <span><b>Впиши числа</b>Ширина, высота, длина, угол, материал, соединение на каждом конце — те самые параметры, которыми уже думает цех.</span>
         </li>
         <li>
           <span class="mono">03</span>
-          <span><b>Watch it redraw</b>The preview rebuilds live and carries its own dimension lines, so the part on screen is visibly the part you meant.</span>
+          <span><b>Смотри, как перерисовывается</b>Превью пересобирается живьём и несёт свои размерные линии, так что деталь на экране — это точно то, что ты имел в виду.</span>
         </li>
         <li>
           <span class="mono">04</span>
-          <span><b>Take the price with it</b>Costing reads the same parameters as the geometry — the number moves when the dimensions do.</span>
+          <span><b>Забери цену вместе с деталью</b>Расчёт стоимости читает те же параметры, что и геометрия — число меняется вместе с размерами.</span>
         </li>
         <li>
           <span class="mono">05</span>
-          <span><b>Build the specification</b>Each item joins a running spec with its quantity and cost, and the whole list goes to the factory as one document.</span>
+          <span><b>Собери спецификацию</b>Каждая позиция попадает в растущую спецификацию со своим количеством и ценой, и весь список уходит на завод одним документом.</span>
         </li>
       </ol>
 
       <ul class="range">
-        <li>Straight runs</li>
-        <li>Bends</li>
-        <li>Transitions</li>
-        <li>Tees</li>
-        <li>Crosses</li>
-        <li>Caps</li>
-        <li>Offsets</li>
-        <li>Saddle taps</li>
-        <li>Connections</li>
-        <li>Roof cowls</li>
-        <li>Extract cowls</li>
-        <li>Grease cassettes</li>
-        <li>Casings</li>
+        <li>Прямые участки</li>
+        <li>Отводы</li>
+        <li>Переходы</li>
+        <li>Тройники</li>
+        <li>Крестовины</li>
+        <li>Заглушки</li>
+        <li>Смещения</li>
+        <li>Врезки</li>
+        <li>Соединения</li>
+        <li>Крышные дефлекторы</li>
+        <li>Вытяжные дефлекторы</li>
+        <li>Жироулавливающие кассеты</li>
+        <li>Кожухи</li>
       </ul>
     </div>
   </section>
 
   <!-- ======================================================================
-       03 — WHAT CHANGED
+       03 — ЧТО ИЗМЕНИЛОСЬ
        =================================================================== -->
   <section class="cut" aria-labelledby="c-t">
     <div class="cut-head">
-      <p class="mono">03 — For the sales desk</p>
-      <h2 id="c-t">The request arrives already specified</h2>
+      <p class="mono">03 — Для отдела продаж</p>
+      <h2 id="c-t">Заявка приходит уже готовой спецификацией</h2>
     </div>
     <div class="cut-body">
       <p>
-        The estimating work doesn't disappear — it moves to the moment the buyer is deciding,
-        and to the person who knows what they want. What reaches the office is the result.
+        Работа по расчёту не исчезает — она переезжает в момент, когда покупатель принимает
+        решение, и к человеку, который сам знает, что ему нужно. В офис приходит уже готовый
+        результат.
       </p>
 
       <div class="shift">
         <div>
-          <span class="was">A request is a list of items described in words</span>
+          <span class="was">Заявка — это список позиций, описанный словами</span>
           <span class="arw" aria-hidden="true">→</span>
-          <span class="now">It arrives as a spec: dimensions, quantities, total</span>
+          <span class="now">Приходит спецификация: размеры, количество, итог</span>
         </div>
         <div>
-          <span class="was">Someone draws each fitting to confirm what was meant</span>
+          <span class="was">Кто-то перерисовывает каждый фитинг, чтобы понять, что хотели</span>
           <span class="arw" aria-hidden="true">→</span>
-          <span class="now">The buyer watched it redraw as they typed</span>
+          <span class="now">Покупатель сам видел, как чертёж перестраивается по ходу ввода</span>
         </div>
         <div>
-          <span class="was">Pricing is a manual pass through the range</span>
+          <span class="was">Расчёт цены — это ручной проход по всему ассортименту</span>
           <span class="arw" aria-hidden="true">→</span>
-          <span class="now">Cost follows the parameters, line by line</span>
+          <span class="now">Стоимость идёт следом за параметрами, строка за строкой</span>
         </div>
         <div>
-          <span class="was">The number comes back later, by email</span>
+          <span class="was">Цифра возвращается позже, письмом</span>
           <span class="arw" aria-hidden="true">→</span>
-          <span class="now">It is on screen while they are still deciding</span>
+          <span class="now">Она на экране, пока решение ещё принимается</span>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ======================================================================
-       04 — STACK
+       04 — СТЕК
        =================================================================== -->
   <section class="cut" aria-labelledby="s-t">
     <div class="cut-head">
-      <p class="mono">04 — Under it</p>
-      <h2 id="s-t">Built with</h2>
+      <p class="mono">04 — Что внутри</p>
+      <h2 id="s-t">Сделано на</h2>
     </div>
     <div class="cut-body">
       <ul class="stack-list mono">
-        <li>Parametric geometry</li>
-        <li>Real-time preview</li>
-        <li>Dimension lines</li>
-        <li>Catalogue-driven costing</li>
-        <li>Specification output</li>
+        <li>Параметрическая геометрия</li>
+        <li>Превью в реальном времени</li>
+        <li>Размерные линии</li>
+        <li>Расчёт стоимости по каталогу</li>
+        <li>Вывод спецификации</li>
       </ul>
       <p>
-        The drawing is the easy half. The work is in the rules: every family of fitting is a
-        function — parameters in, geometry and material out — and each one has to agree with
-        how the workshop actually cuts and joins the part. Costing runs off <b>the same
-        parameters as the geometry</b>, so the preview and the price can never end up
-        describing different objects. The specification is generated from those same values —
-        dimensions, material, connections, quantity — in the form the factory already works
-        from, which is what makes it a quoting tool rather than a drawing toy.
+        Рисунок — это простая половина. Основная работа — в правилах: каждое семейство
+        фитингов — это функция: на входе параметры, на выходе геометрия и материал, и
+        каждая должна совпадать с тем, как цех на самом деле режет и соединяет деталь.
+        Расчёт стоимости работает от <b>тех же параметров, что и геометрия</b>, поэтому
+        превью и цена никогда не могут описывать разные объекты. Спецификация строится из
+        тех же значений — размеры, материал, соединения, количество — в том виде, в котором
+        уже работает завод, и именно это делает инструмент расчётным, а не просто игрушкой
+        для рисования.
       </p>
     </div>
   </section>
 
-  <a class="next" href="../standes/">
-    <p class="mono">Next case</p>
-    <h3><span>Standes — 3D shelving configurator</span><span class="arw" aria-hidden="true">→</span></h3>
-    <p class="sub">The customer lays out their own room in 3D, walks the finished layout in AR at full size, and sends the factory a plan instead of an email thread.</p>
+  <a class="next" href="../../standes/">
+    <p class="mono">Следующий кейс</p>
+    <h3><span>Standes — конфигуратор 3D-стеллажей</span><span class="arw" aria-hidden="true">→</span></h3>
+    <p class="sub">Покупатель сам расставляет мебель в своей комнате в 3D, обходит готовую раскладку в AR в полный размер и отправляет заводу план вместо переписки по почте.</p>
   </a>
 
 </main>
 
 <section class="contact shell">
   <div>
-    <h2>Got a range that only exists once someone types the numbers?</h2>
+    <h2>Есть ассортимент, который существует только после того, как в него вписали числа?</h2>
 
     <p class="pitch">
-      I'm <b>Artur Smirnov</b> — I designed and built this one end to end, and I take this
-      kind of work on contract. Send me a spec you priced by hand this week. I'll come back
-      with what it takes to make it generate itself, and what it wouldn't be worth doing.
+      Я <b>Артур Смирнов</b> — спроектировал и собрал это от начала до конца, и беру такую
+      работу на подряд. Пришлите спецификацию, которую в этот раз считали вручную. Отвечу,
+      что нужно, чтобы она считала себя сама, и что делать так не стоит.
     </p>
 
     <a class="handle" href="mailto:paladei702@gmail.com">
@@ -990,45 +983,31 @@
   </div>
 
   <div class="contact-meta mono">
-    <span>Currently available for contract work</span>
-    <span>Belgrade · UTC+2 — a full European day and US East Coast mornings</span>
-    <span>Usually a reply within the hour</span>
+    <span>Сейчас свободен для проектной работы</span>
+    <span>Белград · UTC+2 — полный европейский день и утро по восточному времени США</span>
+    <span>Обычно отвечаю в течение часа</span>
   </div>
 </section>
 
 <footer class="shell mono">
-  <span>Artur Smirnov — real-time 3D &amp; browser engineering</span>
-  <a href="../../">smirnov-artur.github.io/webgl</a>
+  <span>Артур Смирнов — real-time 3D и разработка для браузера</span>
+  <a href="../../../">smirnov-artur.github.io/webgl</a>
 </footer>
 
 <script>
-/* =========================================================================
-   THE RIG — one family of the real configurator, cut down to a single shape.
-   A rectangular straight run is generated from three numbers, projected
-   axonometrically and drawn as an engineering view: the dimension lines are
-   part of the geometry, not decoration, and the metal is costed off the same
-   parameters. No library — the whole thing is smaller than one icon font.
-   ====================================================================== */
 (function () {
   var svg = document.getElementById('duct');
   if (!svg) return;
 
   var P = { a: 500, b: 300, l: 1250, t: 0.7 };
 
-  var SEAM = 60;      /* mm of blank taken by the folded seam */
-  var RHO  = 7850;    /* kg/m³, steel */
-  var RATE = 1.80;    /* €/kg — a placeholder rate, called out under the panel */
+  var SEAM = 60;
+  var RHO  = 7850;
+  var RATE = 1.80;
 
   var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   svg.appendChild(g);
 
-  /* ---------------------------------------------------------------------
-     Camera. The frame re-fits on a spring, so moving a slider glides
-     instead of snapping between the discrete steps. Only the view carries
-     inertia: the geometry, its dimension labels and the figures below stay
-     exact and instant, because on a drawing that quotes a price a value
-     that lags is a value that lies.
-     ------------------------------------------------------------------ */
   var REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var cam = null, camT = null, camV = [0, 0, 0, 0], raf = null, last = 0;
 
@@ -1046,7 +1025,7 @@
   function tick(now) {
     var dt = Math.min((now - last) / 1000, 1 / 30);
     last = now;
-    var K = 190, C = 2 * Math.sqrt(190);   /* critically damped — a drawing must not wobble */
+    var K = 190, C = 2 * Math.sqrt(190);
     var moving = false;
     for (var i = 0; i < 4; i++) {
       camV[i] += (-K * (cam[i] - camT[i]) - C * camV[i]) * dt;
@@ -1062,7 +1041,6 @@
     }
   }
 
-  /* length runs across the view, width recedes up and to the left */
   function pr(u, v, w) { return [u - 0.45 * w, -(v + 0.30 * w)]; }
 
   function fmt(p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }
@@ -1087,9 +1065,9 @@
     var miny = Math.min.apply(null, ys), maxy = Math.max.apply(null, ys);
     var S = Math.max(maxx - minx, maxy - miny);
 
-    var d  = 0.115 * S;   /* stand-off of the dimension line */
-    var ah = 0.032 * S;   /* arrow length */
-    var fs = 0.052 * S;   /* label size */
+    var d  = 0.115 * S;
+    var ah = 0.032 * S;
+    var fs = 0.052 * S;
 
     function arrow(tip, dx, dy) {
       var bx = tip[0] + dx * ah, by = tip[1] + dy * ah;
@@ -1098,7 +1076,6 @@
              fmt([bx + nx, by + ny]) + ' ' + fmt([bx - nx, by - ny]) + '"/>';
     }
 
-    /* a real dimension: witness lines off the geometry, arrows, and the value */
     function dimension(p1, p2, off, key, val, labOff, anchor) {
       var q1 = [p1[0] + off[0], p1[1] + off[1]];
       var q2 = [p2[0] + off[0], p2[1] + off[1]];
@@ -1112,8 +1089,6 @@
               line(p2, [q2[0] + ex * ah * 0.6, q2[1] + ey * ah * 0.6], 'wit');
 
       if (len < 2.8 * ah) {
-        /* too tight for arrows between the witness lines — put them outside
-           pointing in, the way the dimension would be drawn on paper */
         s += line([q1[0] - ux * ah * 1.7, q1[1] - uy * ah * 1.7],
                   [q2[0] + ux * ah * 1.7, q2[1] + uy * ah * 1.7], 'dim') +
              arrow(q1, -ux, -uy) + arrow(q2, ux, uy);
@@ -1131,12 +1106,10 @@
 
     var out = [];
 
-    /* three faces catch the light differently — enough to read as a solid */
-    out.push(face([C(0,0,0), C(L,0,0), C(L,B,0), C(0,B,0)], '#12151A'));   /* front */
-    out.push(face([C(0,B,0), C(L,B,0), C(L,B,A), C(0,B,A)], '#181D24'));   /* top */
-    out.push(face([C(L,0,0), C(L,B,0), C(L,B,A), C(L,0,A)], '#0C0F13'));   /* open end */
+    out.push(face([C(0,0,0), C(L,0,0), C(L,B,0), C(0,B,0)], '#12151A'));
+    out.push(face([C(0,B,0), C(L,B,0), C(L,B,A), C(0,B,A)], '#181D24'));
+    out.push(face([C(L,0,0), C(L,B,0), C(L,B,A), C(L,0,A)], '#0C0F13'));
 
-    /* the three edges meeting at the far bottom corner are behind the solid */
     out.push(line(C(0,0,A), C(L,0,A), 'eh'));
     out.push(line(C(0,0,A), C(0,B,A), 'eh'));
     out.push(line(C(0,0,0), C(0,0,A), 'eh'));
@@ -1158,21 +1131,20 @@
 
     g.innerHTML = out.join('');
 
-    /* pad asymmetrically — the labels only stick out where the dimensions are */
     setView(minx - 0.22 * S,
             miny - 0.30 * S,
             (maxx - minx) + 0.22 * S + 0.36 * S,
             (maxy - miny) + 0.30 * S + 0.30 * S);
 
     var t = svg.querySelector('title');
-    if (t) t.textContent = 'A rectangular duct section, ' + A + ' by ' + B +
-                           ' millimetres, ' + L + ' millimetres long, drawn with its dimension lines';
+    if (t) t.textContent = 'Прямоугольный участок воздуховода, ' + A + ' на ' + B +
+                           ' миллиметров, длиной ' + L + ' миллиметров, с размерными линиями';
   }
 
   function figures() {
-    var blank = 2 * (P.a + P.b) + SEAM;              /* mm across the flat sheet */
-    var area  = blank * P.l / 1e6;                   /* m² */
-    var mass  = area * (P.t / 1000) * RHO;           /* kg */
+    var blank = 2 * (P.a + P.b) + SEAM;
+    var area  = blank * P.l / 1e6;
+    var mass  = area * (P.t / 1000) * RHO;
     document.getElementById('out-blank').textContent = Math.round(blank);
     document.getElementById('out-area').textContent  = area.toFixed(2);
     document.getElementById('out-mass').textContent  = mass.toFixed(1);
@@ -1181,9 +1153,6 @@
 
   function paint() { build(); figures(); }
 
-  /* Two ways in for the same number: drag it, or type the dimension you have
-     in front of you. The slider keeps a round step because it is nicer to
-     drag; the field takes any millimetre, and the field is what holds truth. */
   [['in-a', 'num-a', 'a'], ['in-b', 'num-b', 'b'], ['in-l', 'num-l', 'l']].forEach(function (row) {
     var range = document.getElementById(row[0]);
     var num = document.getElementById(row[1]);
@@ -1199,14 +1168,11 @@
 
     range.addEventListener('input', function () { apply(+range.value, 'range'); });
 
-    /* take a typed value the moment it is a number inside the range, so 630
-       lands as you type — without fighting a half-typed "6" by clamping it */
     num.addEventListener('input', function () {
       var v = parseInt(num.value, 10);
       if (isFinite(v) && v >= lo && v <= hi) apply(v, 'num');
     });
 
-    /* leaving the field, or pressing enter, settles whatever is left in it */
     num.addEventListener('change', function () {
       var v = parseInt(num.value, 10);
       if (!isFinite(v)) v = P[key];
@@ -1222,7 +1188,7 @@
     [].forEach.call(gauge.querySelectorAll('button'), function (b) {
       b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
     });
-    document.getElementById('out-t').textContent = P.t.toFixed(1) + ' mm';
+    document.getElementById('out-t').textContent = P.t.toFixed(1) + ' мм';
     figures();
   });
 
