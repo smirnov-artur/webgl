@@ -3,7 +3,7 @@
 **Live: [smirnov-artur.github.io/webgl](https://smirnov-artur.github.io/webgl/)**
 
 Three.js and hand-written GLSL: 3D product configurators, engineering calculators, and
-interactive sites. Available for contract work — Belgrade, UTC+2.
+interactive sites. Available for contract work — Moscow, UTC+3.
 
 This repository is the source of every page linked below. No framework and no build step
 on the hand-written pages; each one is a single HTML document you can read top to bottom.
@@ -89,4 +89,4 @@ Contract work, from a single tool to a full site.
 
 - Telegram — [@smirnovarturr](https://t.me/smirnovarturr)
 - Email — paladei702@gmail.com
-- Portfolio — [smirnov-artur.github.io/webgl](https://smirnov-artur.github.io/webgl/)
+- Portfolio — [smirnov-artur.github.io/works/en](https://smirnov-artur.github.io/works/en)
